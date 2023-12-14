@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/png" href="static/images/icons/favicon.ico" >
+    <link rel="stylesheet" type="text/css" href="static/fonts/font-awesome-4.7.0/css/font-awesome.min.css" >
+    <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body class="body__auth">
+    <div class="login__container">
+        <form method="POST" class="form-register">
+            <div class="form__container">
+                <span class="from__title-register">
+                    <b>Регистрация</b>
+                </span>
+                <div class="form__radio">
+                    {% for i in range(form.role.choices|length) %}
+                        {% if i == 0 %}
+                            <input type="radio" id="client" name="role" value="{{ form.role.choices[i][0] }}" checked>
+                            <label for="client" class="form__radio-label">{{ form.role.choices[i][1] }}</label><br>
+                        {% else %}
+                            <input type="radio" id="admin" name="role" value="{{ form.role.choices[i][0] }}">
+                            <label for="admin" class="form__radio-label">{{ form.role.choices[i][1] }}</label><br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+            </div>
+            {{ form.hidden_tag() }}
+
+            <div class="form__group">
+                <div class="form__group-elem">
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="username" placeholder="{{ form.username.label.text + '*' }}">
+                    </div>
+
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="email" placeholder="{{ form.email.label.text + '*' }}">
+                    </div>
+
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="first_name" placeholder="{{ form.first_name.label.text }}">
+                    </div>
+
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="last_name" placeholder="{{ form.last_name.label.text }}">
+                    </div>
+
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="patronymic" placeholder="{{ form.patronymic.label.text }}">
+                    </div>
+                </div>
+                <div class="form__group-elem">
+                    <div class="form__container form__input-container">
+                        <input class="form__input-date" type="date" name="birth_date" id="dateField" placeholder="{{ form.birth_date.label.text }}">
+                    </div>
+
+                    <div class="form__container form__input-container">
+                        <input class="form__input" type="text" name="phone_number" placeholder="{{ form.phone_number.label.text }}">
+                    </div>
+
+                    <div class="form__container form__input-container" >
+                        <input class="form__input" type="password" name="password" placeholder="{{ form.password.label.text + '*' }}">
+                    </div>
+
+                    <div class="form__container form__input-container" >
+                        <input class="form__input" type="password" name="confirm_password" placeholder="{{ form.confirm_password.label.text + '*' }}">
+                    </div>
+
+                    <div class="form__container form__input-container" id="department" style="display: none;">
+                        <select class="form__select" name="department">
+                            {% for dept in form.department.choices %}
+                                <option value="{{ dept[0] }}">{{ dept[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form__text" id="client_field">
+                        <p class="form__not-required-text">Поля помеченные * обязательны к заполнению</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form__container form__btn_container">
+                <button class="form__btn" type="submit"><b>Зарегистрироваться</b></button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('dateField').valueAsDate = new Date();
+
+        document.getElementById('client').addEventListener('change', function() {
+            document.getElementById('client_field').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('department').style.display = this.checked ? 'none' : 'block';
+        });
+
+        document.getElementById('admin').addEventListener('change', function() {
+            document.getElementById('admin_field').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('department').style.display = this.checked ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>

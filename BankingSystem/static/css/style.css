@@ -1,0 +1,91 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: Roboto, sans-serif;
+    font-weight: 400;
+    background: #FFFFFF;
+}
+
+img, svg {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+}
+
+button {
+    padding: 0;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+h1, h2, h3, h4, p {
+    margin: 0;
+}
+
+fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.container {
+    padding: 0 100px;
+    margin: 0 auto;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.body__auth {
+    background: #365ABA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn {
+    padding: 8px 15px;
+    background: #365ABA;
+    border-radius: 15px;
+    font-size: 20px;
+    text-transform: capitalize;
+    color: #FFFFFF;
+}

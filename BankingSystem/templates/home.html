@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+    <div class="container home__container">
+        <div class="home__content">
+            <div class="home__title">
+                <h1 class="home__rate-title"><b>Курсы валют доступные в банке</b></h1>
+                <p class="home__elem-text">{{ 'C ' + date }}</p>
+            </div>
+            <div class="home__group">
+                {% for i in range(currencies|length) %}
+                    <div class="home__group-elem">
+                        <p class="home__elem-text">
+                            {{ ('100 ' if currencies[i].currency_name == 'RUB' else '1 ') + currencies[i].currency_name }}
+                        </p>
+                        <div class="home__group">
+                            <div class="home__group-elem">
+                                <p class="home__elem-text">Покупка</p>
+                                <p class="home__elem-text">
+                                    {{ rates[i][0][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1) }}
+                                </p>
+                            </div>
+                            <div class="home__group-elem">
+                                <p class="home__elem-text">Продажа</p>
+                                <p class="home__elem-text">
+                                    {{ rates[i][1][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="home__title block2">
+                <h1 class="home__rate-title"><b>Конвертер валют</b></h1>
+            </div>
+            <form action="/convert" method="post" class="home__group-form">
+                <div class="home__form">
+                    <div class="home__form-elem elem1">
+                        <select class="home__select" name="currency1">
+                            <option value="BYN">BYN</option>
+                            {% for currency in currencies %}
+                                <option value="{{ currency.currency_name }}">{{ currency.currency_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="home__input" type="number" name="input_currency1"
+                           placeholder="BYN" value="{{ '' }}">
+                    </div>
+                    <div class="home__form-elem elem2">
+                        <select class="home__select" name="currency2">
+                            <option value="BYN">BYN</option>
+                            {% for currency in currencies %}
+                                <option value="{{ currency.currency_name }}">{{ currency.currency_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="home__input" type="number" name="input_currency2"
+                           placeholder="BYN"
+                           value="{{ '' }}">
+                    </div>
+                </div>
+                <input type="hidden" name="currency" value="{{ '' }}">
+                <button class="btn home__btn" type="submit">Конвертировать</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        window.onload = function() {
+            var selectElements = document.querySelectorAll('select');
+            selectElements.forEach(function(selectElement) {
+                selectElement.addEventListener('change', function() {
+                    var selectedOption = this.options[this.selectedIndex];
+                    var inputElement = this.parentElement.querySelector('input');
+                    inputElement.placeholder = selectedOption.value;
+                });
+            });
+
+            var form = document.querySelector('.home__group-form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var currency1 = form.elements['currency1'].value;
+                var input_currency1 = form.elements['input_currency1'].value;
+                var currency2 = form.elements['currency2'].value;
+                var input_currency2 = form.elements['input_currency2'].value;
+
+                fetch('/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        currency1: currency1,
+                        input_currency1: input_currency1,
+                        currency2: currency2,
+                        input_currency2: input_currency2,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (input_currency1) {
+                        form.elements['input_currency2'].value = data.converted_amount;
+                    } else if (input_currency2) {
+                        form.elements['input_currency1'].value = data.converted_amount;
+                    }
+                });
+            });
+        }
+    </script>
+
+{#    <script>#}
+{#        window.onload = function() {#}
+{#            var form = document.querySelector('.home__group-form');#}
+{#            form.addEventListener('submit', function(event) {#}
+{#                event.preventDefault();#}
+{##}
+{#                var currency1 = form.elements['currency1'].value;#}
+{#                var input_currency1 = form.elements['input_currency1'].value;#}
+{#                var currency2 = form.elements['currency2'].value;#}
+{#                var input_currency2 = form.elements['input_currency2'].value;#}
+{##}
+{#                fetch('/convert', {#}
+{#                    method: 'POST',#}
+{#                    headers: {#}
+{#                        'Content-Type': 'application/json',#}
+{#                    },#}
+{#                    body: JSON.stringify({#}
+{#                        currency1: currency1,#}
+{#                        input_currency1: input_currency1,#}
+{#                        currency2: currency2,#}
+{#                        input_currency2: input_currency2,#}
+{#                    }),#}
+{#                })#}
+{#                .then(response => response.json())#}
+{#                .then(data => {#}
+{#                    if (input_currency1) {#}
+{#                        form.elements['input_currency2'].value = data.converted_amount;#}
+{#                    } else if (input_currency2) {#}
+{#                        form.elements['input_currency1'].value = data.converted_amount;#}
+{#                    }#}
+{#                });#}
+{#            });#}
+{#        }#}
+{#    </script>#}
+
+{% endblock %}

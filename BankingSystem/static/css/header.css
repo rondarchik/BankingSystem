@@ -1,0 +1,29 @@
+.header {
+    padding: 0 0 5px 0;
+}
+
+.header__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.header__logo {
+    max-width: 50px;
+}
+
+.header__shadow {
+    background: transparent;
+    box-shadow: 0 0 5px rgba(218, 218, 218);
+}
+
+.header__nav-navigation {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-left: 15px;
+}

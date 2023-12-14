@@ -1,0 +1,9 @@
+@import 'normalize.css';
+@import 'style.css';
+@import 'fonts.css';
+@import 'header.css';
+@import 'nav.css';
+@import 'login.css';
+@import 'form_login.css';
+@import 'form_register.css';
+@import 'home.css';

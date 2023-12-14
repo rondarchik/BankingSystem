@@ -1,0 +1,120 @@
+.home__container {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home__content {
+    border-radius: 25px;
+    border: 1px solid #999999;
+    width: 1200px;
+    display: block;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.home__title {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.home__rate-title {
+    font-weight: 300;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 7px;
+}
+
+.home__group {
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.home__group-form {
+    display: flex;
+    width: 100%;
+    margin-bottom: 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home__form {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.home__group-elem {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.home__form-elem {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home__group-elem:not(:last-child)::after {
+    content: "";
+    border-right: 1px solid #999999; /* Цвет и толщина линии */
+    height: 100%; /* Высота линии */
+    position: absolute;
+    right: 0;
+}
+
+.home__elem-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.block2 {
+    margin-top: 30px;
+}
+
+.elem1 {
+    margin-left: 10%;
+ }
+
+.elem2 {
+    margin-right: 10%;
+}
+
+.home__input {
+    width: 30%;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #999999;
+    padding: 0 15px 0 15px;
+}
+
+.home__btn {
+    width: 25%;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.home__select {
+    width: 20%;
+    height: 30px;
+    border-radius: 10px;
+    background: #eeeeee;
+    color: #666666;
+    border: 1px solid #666666;
+    padding: 0 15px 0 15px;
+    margin-right: 10px;
+}
