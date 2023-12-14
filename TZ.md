@@ -1,6 +1,6 @@
 ## Техническое задание проекта
-[Ссылочка на use-case](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1#G1n6N7FXpIIOTmvwF4XuVkGbvDAOpPS5la)
-[Ссылочка на схему БД](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1#G1rYZegRmEquOWWfJ-WFjaRe3YpEi9947F)
+#### [Ссылочка на use-case](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1#G1n6N7FXpIIOTmvwF4XuVkGbvDAOpPS5la)
+#### [Ссылочка на схему БД](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1#G1rYZegRmEquOWWfJ-WFjaRe3YpEi9947F)
 Приложение должно выполнять следующие функции:
 #### **1 Регистрация и аутентификация пользователей**
 В системе будет 2 основных роли для пользователей: «Клиент» и «Администратор» (сотрудник банка). Функция регистрации должна быть реализована с учетом следующих требований:
