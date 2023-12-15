@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, jsonify
 from flask_migrate import Migrate
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
 from models import *
 from forms import *
@@ -43,6 +43,11 @@ def home():
             ).all()
         ])
 
+    if current_user.is_authenticated:
+        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+        if user_role == 'Админ':
+            return render_template('home_admin.html')
+
     return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
 
 
@@ -71,9 +76,6 @@ def convert():
     else:
         return jsonify(error='Введите сумму для конвертации')
 
-    # rate = get_rates(to_currency, from_currency)
-    # converted_amount = convert_currency(amount, rate)
-
     return jsonify(converted_amount=converted_amount)
 
 
@@ -89,7 +91,7 @@ def get_rates(to_currency, from_currency):
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id):  # ?????
     return User.query.get(int(user_id))
 
 
@@ -102,7 +104,7 @@ def login():
             login_user(user)
             return redirect(url_for('home'))
         else:
-            # Если имя пользователя или пароль неверны
+            print(form.username.data, user.check_password('qwert123'))
             pass
     return render_template('login.html', form=form)
 
