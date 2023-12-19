@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify, abort
+from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -53,19 +53,45 @@ def home():
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile():
-    form = ProfileEditForm()
-
-    departments = Department.query.with_entities(Department.id, Department.department_address).all()
-    form.department.choices = [(dept.id, dept.department_address) for dept in departments]
+    form = ProfileEditForm(request.form)
+    dept = None
 
     if current_user.is_authenticated:
         user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
-        # print(user_role == 'Админ')
-        # if user_role == 'Админ':
-        #     if form.validate_on_submit():
-        #         pass
+        user = User.query.filter_by(id=current_user.id).first()
+        if request.method == 'GET':
+            form.username.data = user.username
+            form.email.data = user.email
+            form.first_name.data = user.first_name
+            form.last_name.data = user.last_name
+            form.patronymic.data = user.patronymic
+            birth_date = datetime.strptime(str(user.birth_date), "%Y-%m-%d %H:%M:%S")
+            form.birth_date.data = birth_date.date()
+            form.phone_number.data = user.phone_number
 
-    return render_template('profile.html', form=form, user_role=user_role)
+            if user_role == 'Админ':
+                admin = Admin.query.filter_by(id=current_user.id).first()
+                dept = (Department.query.with_entities(Department.id, Department.department_address)
+                    .filter(Department.id == admin.department_id).all())
+
+        if form.validate_on_submit():
+            # user.username = form.username.data  - я сделала так, что изменять нельзя, потому что кому нужны эти заморочки
+            user.email = form.email.data
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.patronymic = form.patronymic.data
+            user.birth_date = form.birth_date.data
+            user.phone_number = form.phone_number.data
+
+            if form.password.data != '':
+                user.set_password(form.password.data)
+
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            print(form.errors)
+
+    return render_template('profile.html', form=form, user_role=user_role, dept=dept)
 
 
 @app.route('/convert', methods=['POST'])
@@ -162,7 +188,6 @@ def register():
         )
         db.session.add(user_role)
 
-        id = form.role.data
         if form.role.data == '1':  # ID роли клиента
             client = Client(id=user_id)
             db.session.add(client)

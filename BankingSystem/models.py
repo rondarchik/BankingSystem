@@ -16,9 +16,6 @@ class User(db.Model, UserMixin):
     phone_number = db.Column(db.String(20))
     birth_date = db.Column(db.DateTime, default=datetime.now)
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
-
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
