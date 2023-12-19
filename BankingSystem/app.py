@@ -4,7 +4,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from config import Config
 from models import *
 from forms import *
-from utils import *
 from init_db import db
 
 
@@ -54,9 +53,6 @@ def home():
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile():
-    if not current_user.has_role('Админ'):
-        abort(403)
-
     form = ProfileEditForm()
 
     departments = Department.query.with_entities(Department.id, Department.department_address).all()
@@ -64,11 +60,12 @@ def profile():
 
     if current_user.is_authenticated:
         user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
-        if user_role == 'Админ':
-            if form.validate_on_submit():
-                pass
+        # print(user_role == 'Админ')
+        # if user_role == 'Админ':
+        #     if form.validate_on_submit():
+        #         pass
 
-    return render_template('profile.html', form=form)
+    return render_template('profile.html', form=form, user_role=user_role)
 
 
 @app.route('/convert', methods=['POST'])

@@ -51,7 +51,7 @@
                             <input class="profile__form-input" type="password" name="confirm_password" placeholder="{{ form.confirm_password.label.text }}">
                         </div>
 
-                        {% if current_user.role == 'Admin' %}
+                        {% if current_user.is_authenticated and user_role == 'Админ' %}
                             <div class="form__container form__input-container" id="department">
                                 <select class="profile-form__select" name="department">
                                     {% for dept in form.department.choices %}
