@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, abort
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -49,6 +49,26 @@ def home():
             return render_template('home_admin.html')
 
     return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
+
+
+@app.route('/profile', methods=['POST', 'GET'])
+@login_required
+def profile():
+    if not current_user.has_role('Админ'):
+        abort(403)
+
+    form = ProfileEditForm()
+
+    departments = Department.query.with_entities(Department.id, Department.department_address).all()
+    form.department.choices = [(dept.id, dept.department_address) for dept in departments]
+
+    if current_user.is_authenticated:
+        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+        if user_role == 'Админ':
+            if form.validate_on_submit():
+                pass
+
+    return render_template('profile.html', form=form)
 
 
 @app.route('/convert', methods=['POST'])
@@ -103,9 +123,8 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect(url_for('home'))
-        else:
-            print(form.username.data, user.check_password('qwert123'))
-            pass
+    else:
+        print(form.errors)
     return render_template('login.html', form=form)
 
 

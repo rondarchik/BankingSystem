@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <div class="container profile__container">
+        <div class="profile__content">
+            <div class="profile__title">
+                <h1 class="profile__rate-title"><b>Личный кабинет пользователя</b></h1>
+            </div>
+
+            <form method="POST" class="form-register">
+                {{ form.hidden_tag() }}
+
+                <div class="profile__form-group">
+                    <div class="form__group-elem">
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="username" placeholder="{{ form.username.label.text}}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="email" placeholder="{{ form.email.label.text}}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="first_name" placeholder="{{ form.first_name.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="last_name" placeholder="{{ form.last_name.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="patronymic" placeholder="{{ form.patronymic.label.text }}">
+                        </div>
+                    </div>
+                    <div class="form__group-elem">
+                        <div class="form__container form__input-container">
+                            <input class="profile-form__input-date" type="date" name="birth_date" id="dateField" placeholder="{{ form.birth_date.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="phone_number" placeholder="{{ form.phone_number.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container" >
+                            <input class="profile__form-input" type="password" name="password" placeholder="{{ form.password.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container" >
+                            <input class="profile__form-input" type="password" name="confirm_password" placeholder="{{ form.confirm_password.label.text }}">
+                        </div>
+
+                        {% if current_user.role == 'Admin' %}
+                            <div class="form__container form__input-container" id="department">
+                                <select class="profile-form__select" name="department">
+                                    {% for dept in form.department.choices %}
+                                        <option value="{{ dept[0] }}">{{ dept[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <div class="form__text" id="client_field" style="display: none;">
+                            <p class="form__not-required-text">Поля помеченные * обязательны к заполнению</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__container form__btn_container">
+                    <button class="profile-form__btn" type="submit"><b>Сохранить изменения</b></button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.getElementById('dateField').valueAsDate = new Date();
+    </script>
+{% endblock %}

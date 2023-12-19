@@ -23,3 +23,19 @@ class LoginForm(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     submit = SubmitField('Войти')
+
+
+class ProfileEditForm(FlaskForm):
+    username = StringField('Имя пользователя', validators=[DataRequired()])
+    email = StringField('Электронная почта', validators=[DataRequired(), Email()])
+    first_name = StringField('Имя', validators=[])
+    last_name = StringField('Фамилия', validators=[])
+    patronymic = StringField('Отчество', validators=[])
+    phone_number = StringField('Номер телефона', validators=[])
+    birth_date = DateField('Дата рождения', format='%Y-%m-%d', validators=[])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    confirm_password = PasswordField('Повторите пароль', validators=[DataRequired(), EqualTo('password')])
+    department = SelectField('Отдел', choices=[], validators=[DataRequired()])
+
+    submit = SubmitField('Сохранить изменения')
+

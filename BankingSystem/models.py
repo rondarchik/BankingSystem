@@ -15,6 +15,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(50), unique=True, nullable=False)
     phone_number = db.Column(db.String(20))
     birth_date = db.Column(db.DateTime, default=datetime.now)
+    role_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

@@ -27,8 +27,10 @@
 
             <nav class="nav header__nav-auth">
                 {% if current_user.is_authenticated %}
+                    <a href="/profile" class="nav__link nav__btn nav__btn-auth">Личный кабинет</a>
+
                     <a href="/logout" class="nav__btn">
-                        <button class="btn">Выйти</button>
+                        <button class="btn nav__auth-btn">Выйти</button>
                     </a>
                 {% else %}
                     <a href="/register" class="nav__btn">

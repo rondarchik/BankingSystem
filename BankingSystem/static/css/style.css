@@ -20,6 +20,11 @@ body {
     background: #FFFFFF;
 }
 
+main {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 img, svg {
     display: block;
     max-width: 100%;
@@ -86,6 +91,5 @@ fieldset {
     background: #365ABA;
     border-radius: 15px;
     font-size: 20px;
-    text-transform: capitalize;
     color: #FFFFFF;
 }

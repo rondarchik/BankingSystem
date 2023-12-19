@@ -54,7 +54,6 @@
 
 .form__btn {
     width: 100%;
-    line-height: 1.5;
     height: 50px;
     border-radius: 25px;
     display: flex;
@@ -63,7 +62,6 @@
     padding: 0 25px;
     background: #365ABA;
     font-size: 15px;
-    text-transform: capitalize;
     color: #FFFFFF;
 }
 

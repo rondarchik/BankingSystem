@@ -14,3 +14,12 @@
 .nav__link {
     color: #365ABA;
 }
+
+.nav__btn-auth {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.nav__auth-btn {
+    margin-top: 5px;
+}
