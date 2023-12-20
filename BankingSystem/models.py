@@ -133,14 +133,22 @@ class Credit(db.Model):
     end_date = db.Column(db.DateTime, default=datetime.now)
     is_closed = db.Column(db.Boolean, default=False)
 
+    user = db.relationship('User', foreign_keys=[user_id])
+
 
 class CreditRequest(db.Model):
     __tablename__ = 'CreditsRequests'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    amount = db.Column(db.Float)
+    interest_rate = db.Column(db.Float, default=0.1)
     department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'), nullable=False)
     status = db.Column(db.Boolean, default=False)
     request_date = db.Column(db.DateTime, default=datetime.now)
+    date_term = db.Column(db.Integer)
+
+    user = db.relationship('User', foreign_keys=[user_id])
+    department = db.relationship('Department', foreign_keys=[department_id])
 
 
 class Deposit(db.Model):

@@ -173,6 +173,47 @@ def create_account():
     return render_template('new_bank_account.html', form=form)
 
 
+def get_user_credits_and_applications(user):
+    user_credits = Credit.query.filter_by(user_id=user).all()
+    user_applications = CreditRequest.query.filter_by(user_id=user, status=False).all()
+    return user_credits, user_applications
+
+
+@app.route('/credit', methods=['POST', 'GET'])
+@login_required
+# @role_required('Клиент')
+def credit():
+    credits, applications = get_user_credits_and_applications(current_user.id)
+    return render_template('credit.html', credits=credits, applications=applications)
+
+
+@app.route('/create_credit', methods=['POST', 'GET'])
+@login_required
+# @role_required('Клиент')
+def create_credit():
+    form = CreditRequestForm()
+
+    departments = Department.query.with_entities(Department.id, Department.department_address).all()
+    form.department.choices = [(dept.id, dept.department_address) for dept in departments]
+
+    if form.validate_on_submit():
+        appliction = CreditRequest(
+            user_id=current_user.id,
+            amount=form.amount.data,
+            interest_rate=form.interest_rate.data,
+            date_term=form.term.data,
+            department_id=form.department.data,
+        )
+
+        db.session.add(appliction)
+        db.session.commit()
+        return redirect(url_for('credit'))
+    else:
+        print(form.errors)
+
+    return render_template('new_credit.html', form=form)
+
+
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile():

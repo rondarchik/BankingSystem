@@ -3,4 +3,52 @@
 {% block title %}Кредиты{% endblock %}
 
 {% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Кредиты</b></h1>
+            </div>
+
+            {%  if credits or applications %}
+                <table class="account__table">
+                    <tr class="account__table-row">
+                        <th class="account__table-column_header">Сумма</th>
+                        <th class="account__table-column_header">Выплаченная сумма</th>
+                        <th class="account__table-column_header">Процентная ставка</th>
+                        <th class="account__table-column_header">Дата открытия</th>
+                        <th class="account__table-column_header">Дата закрытия</th>
+                        <th class="account__table-column_header">Статус</th>
+                    </tr>
+                    {% for credit in credits %}
+                    <tr class="account__table-row">
+                        <td class="account__table-column">{{ credit.amount }}</td>
+                        <td class="account__table-column">{{ credit.repaid_amount }}</td>
+                        <td class="account__table-column">{{ credit.interest_rate }}</td>
+                        <td class="account__table-column">{{ credit.start_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="account__table-column">{{ credit.end_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="account__table-column">{{ credit.is_closed }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% for apps in applications %}
+                    <tr class="account__table-row">
+                        <td class="account__table-column">{{ apps.amount }}</td>
+                        <td class="account__table-column"></td>
+                        <td class="account__table-column">{{ apps.interest_rate }}</td>
+                        <td class="account__table-column"></td>
+                        <td class="account__table-column"></td>
+                        <td class="account__table-column">На рассмотрении</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="account__no-text">Кажется у вас нет кредитов.</p>
+            {% endif %}
+
+            <form action="/create_credit" method="post">
+                <div class="form__container form__btn_container">
+                    <button class="btn account__btn">Создать новый</button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

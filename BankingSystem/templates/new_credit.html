@@ -1,10 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Новый кредит{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Оформление заявки на кредит</b></h1>
+            </div>
+
+            <form method="POST" class="form-account">
+                {{ form.hidden_tag() }}
+                <div class="form__credit-group">
+                    <div class="form__credit-group-elem">
+                         <div class="form__container-credit form__input-container">
+                             <input class="profile__form-input" type="number" name="amount"
+                                    placeholder="{{ form.amount.label.text }}">
+                         </div>
+                        <div class="form__container-credit form__input-container">
+                             <input class="profile__form-input" type="number" step="0.01" name="interest_rate"
+                                    placeholder="{{ form.interest_rate.label.text }}">
+                         </div>
+                    </div>
+                    <div class="form__credit-group-elem">
+                        <div class="form__container-credit form__input-container">
+                            <input class="profile__form-input" type="number" name="term"
+                                   placeholder="{{ form.term.label.text }}">
+                        </div>
+
+                        <div class="form__container-credit form__input-container" id="currency" >
+                            <select class="profile-form__select" name="department">
+                                {% for dept in form.department.choices %}
+                                    <option value="{{ dept[0] }}">{{ dept[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__container form__btn_container-acc">
+                    <button class="btn account__btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

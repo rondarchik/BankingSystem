@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, PasswordField, SubmitField, DateField, RadioField, SelectField
+from wtforms import StringField, IntegerField, FloatField, PasswordField, SubmitField, DateField, RadioField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 
@@ -45,3 +45,12 @@ class BankAccountForm(FlaskForm):
     currency = SelectField('Валюта', choices=[], validators=[DataRequired()])
 
     submit = SubmitField('Сохранить')
+
+
+class CreditRequestForm(FlaskForm):
+    amount = FloatField('Сумма', default=0.0)
+    interest_rate = FloatField('Процентная ставка', default=0.0)
+    department = SelectField('Отделение', choices=[], validators=[DataRequired()])
+    term = IntegerField('Длительность', default=0)
+
+    submit = SubmitField('Отправить')
