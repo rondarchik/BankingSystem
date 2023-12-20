@@ -23,3 +23,35 @@
     display: flex;
     justify-content: center;
 }
+
+.credit-admin__content {
+    border-radius: 25px;
+    border: 1px solid #999999;
+    width: 1400px;
+    display: block;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.credit-admin__table {
+    width: 95%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-collapse: collapse;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.no-btn {
+    margin-left: 10px;
+    background: red;
+}
+
+.rows {
+    width: 33.33%;
+    padding: 10px;
+    border: 1px solid #999999;
+}

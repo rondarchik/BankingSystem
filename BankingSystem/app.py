@@ -1,4 +1,7 @@
+from datetime import date
 from functools import wraps
+from sqlalchemy import event
+from dateutil.relativedelta import relativedelta
 from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -184,6 +187,11 @@ def get_user_credits_and_applications(user):
 # @role_required('Клиент')
 def credit():
     credits, applications = get_user_credits_and_applications(current_user.id)
+
+    user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+    if user_role == 'Админ':
+        return render_template('credit_admin.html')
+
     return render_template('credit.html', credits=credits, applications=applications)
 
 
@@ -212,6 +220,49 @@ def create_credit():
         print(form.errors)
 
     return render_template('new_credit.html', form=form)
+
+
+def get_admin_credits_and_applications(user):
+    admin_department_id = Admin.query.filter_by(id=user).first().department_id
+    credit_requests = CreditRequest.query.filter_by(department_id=admin_department_id).all()
+    return credit_requests
+
+
+def get_application(application):
+    credit_requests = CreditRequest.query.filter_by(id=application).first()
+    return credit_requests
+
+
+@app.route('/update_status', methods=['POST'])
+def update_credit_request():
+    application_id = request.form.get('app_id')
+    application = get_application(application_id)
+
+    if application:
+        application.status = True
+
+        credit = Credit(
+            user_id=application.user.id,
+            amount=application.amount,
+            repaid_amount=0,
+            interest_rate=application.interest_rate,
+            start_date=date.today(),
+            end_date=date.today() + relativedelta(months=+application.date_term),
+            is_closed=False
+        )
+        db.session.add(credit)
+        db.session.commit()
+
+    return redirect(url_for('credit_admin'))
+
+
+@app.route('/credit_admin', methods=['POST', 'GET'])
+@login_required
+# @role_required('Клиент')
+def credit_admin():
+    applications = get_admin_credits_and_applications(current_user.id)
+
+    return render_template('credit_admin.html', applications=applications)
 
 
 @app.route('/profile', methods=['POST', 'GET'])

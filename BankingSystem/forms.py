@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, FloatField, PasswordField, SubmitField, DateField, RadioField, SelectField
+from wtforms import StringField, IntegerField, FloatField, BooleanField, PasswordField, SubmitField, DateField, RadioField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 
@@ -54,3 +54,8 @@ class CreditRequestForm(FlaskForm):
     term = IntegerField('Длительность', default=0)
 
     submit = SubmitField('Отправить')
+
+
+class ApproveRequestForm(FlaskForm):
+    status = BooleanField('Статус', default=False)
+    submit = SubmitField('Ok')

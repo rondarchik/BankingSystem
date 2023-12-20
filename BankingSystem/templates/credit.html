@@ -26,18 +26,18 @@
                         <td class="account__table-column">{{ credit.interest_rate }}</td>
                         <td class="account__table-column">{{ credit.start_date.strftime('%Y-%m-%d') }}</td>
                         <td class="account__table-column">{{ credit.end_date.strftime('%Y-%m-%d') }}</td>
-                        <td class="account__table-column">{{ credit.is_closed }}</td>
+                        <td class="account__table-column">Открыт</td>
                     </tr>
                     {% endfor %}
                     {% for apps in applications %}
-                    <tr class="account__table-row">
-                        <td class="account__table-column">{{ apps.amount }}</td>
-                        <td class="account__table-column"></td>
-                        <td class="account__table-column">{{ apps.interest_rate }}</td>
-                        <td class="account__table-column"></td>
-                        <td class="account__table-column"></td>
-                        <td class="account__table-column">На рассмотрении</td>
-                    </tr>
+                        <tr class="account__table-row">
+                            <td class="account__table-column">{{ apps.amount }}</td>
+                            <td class="account__table-column"></td>
+                            <td class="account__table-column">{{ apps.interest_rate }}</td>
+                            <td class="account__table-column"></td>
+                            <td class="account__table-column"></td>
+                            <td class="account__table-column">На рассмотрении</td>
+                        </tr>
                     {% endfor %}
                 </table>
             {% else %}
