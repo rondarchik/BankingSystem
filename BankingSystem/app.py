@@ -49,7 +49,7 @@ def home():
     if current_user.is_authenticated:
         user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
         if user_role == 'Админ':
-            return render_template('home_admin.html')
+            return redirect(url_for('credit_admin'))
 
     return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
 
