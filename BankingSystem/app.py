@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -48,6 +49,128 @@ def home():
             return render_template('home_admin.html')
 
     return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
+
+
+@login_manager.user_loader
+def load_user(user_id):  # ?????
+    return User.query.get(int(user_id))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('home'))
+    else:
+        print(form.errors)
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+
+    roles = Role.query.with_entities(Role.id, Role.role_name).all()
+    form.role.choices = [(role.id, role.role_name) for role in roles]
+    departments = Department.query.with_entities(Department.id, Department.department_address).all()
+    form.department.choices = [(dept.id, dept.department_address) for dept in departments]
+
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            patronymic=form.patronymic.data,
+            phone_number=form.phone_number.data,
+            birth_date=form.birth_date.data
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+
+        user_id = user.id
+        user_role = UserRole(
+            user_id=user_id,
+            role_id=form.role.data
+        )
+        db.session.add(user_role)
+
+        if form.role.data == '1':  # ID роли клиента
+            client = Client(id=user_id)
+            db.session.add(client)
+        elif form.role.data == '2':  # ID роли админа
+            admin = Admin(id=user_id, department_id=form.department.data)
+            db.session.add(admin)
+
+        db.session.commit()
+
+        login_user(user)
+        return redirect(url_for('home'))
+    else:
+        print(form.errors)
+    return render_template('register.html', form=form)
+
+
+def role_required(role):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+            if user_role != role:
+                logout()
+                return redirect(url_for('login', next=request.url))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
+def get_user_accounts(user_id):
+    user_accounts = BankAccount.query.filter_by(user_id=user_id).all()
+    return user_accounts
+
+@app.route('/bank_account', methods=['POST', 'GET'])
+@login_required
+# @role_required('Клиент')
+def bank_account():
+    user_accounts = get_user_accounts(current_user.id)
+    return render_template('bank_account.html', accounts=user_accounts)
+
+
+@app.route('/create_account', methods=['POST', 'GET'])
+@login_required
+# @role_required('Клиент')
+def create_account():
+    form = BankAccountForm()
+
+    currencies = Currency.query.with_entities(Currency.id, Currency.currency_name).all()
+    form.currency.choices = [(currency.id, currency.currency_name) for currency in currencies]
+
+    if form.validate_on_submit():
+        account = BankAccount(
+            user_id=current_user.id,
+            currency_id=form.currency.data,
+            balance=form.balance.data,
+            account_name=form.account_name.data,
+        )
+
+        db.session.add(account)
+        db.session.commit()
+        return redirect(url_for('bank_account'))
+    else:
+        print(form.errors)
+
+    return render_template('new_bank_account.html', form=form)
 
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -131,77 +254,6 @@ def get_rates(to_currency, from_currency):
     .first())
 
     return latest_rates.rate
-
-
-@login_manager.user_loader
-def load_user(user_id):  # ?????
-    return User.query.get(int(user_id))
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            return redirect(url_for('home'))
-    else:
-        print(form.errors)
-    return render_template('login.html', form=form)
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('home'))
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-
-    roles = Role.query.with_entities(Role.id, Role.role_name).all()
-    form.role.choices = [(role.id, role.role_name) for role in roles]
-    departments = Department.query.with_entities(Department.id, Department.department_address).all()
-    form.department.choices = [(dept.id, dept.department_address) for dept in departments]
-
-    if form.validate_on_submit():
-        user = User(
-            username=form.username.data,
-            email=form.email.data,
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            patronymic=form.patronymic.data,
-            phone_number=form.phone_number.data,
-            birth_date=form.birth_date.data
-        )
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-
-        user_id = user.id
-        user_role = UserRole(
-            user_id=user_id,
-            role_id=form.role.data
-        )
-        db.session.add(user_role)
-
-        if form.role.data == '1':  # ID роли клиента
-            client = Client(id=user_id)
-            db.session.add(client)
-        elif form.role.data == '2':  # ID роли админа
-            admin = Admin(id=user_id, department_id=form.department.data)
-            db.session.add(admin)
-
-        db.session.commit()
-
-        login_user(user)
-        return redirect(url_for('home'))
-    else:
-        print(form.errors)
-    return render_template('register.html', form=form)
 
 
 if __name__ == '__main__':

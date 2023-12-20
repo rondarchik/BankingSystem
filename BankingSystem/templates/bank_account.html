@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Счета{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Счета</b></h1>
+            </div>
+
+            {%  if accounts %}
+                <table class="account__table">
+                    <tr class="account__table-row">
+                        <th class="account__table-column_header">Название счета</th>
+                        <th class="account__table-column_header">Баланс</th>
+                        <th class="account__table-column_header">Валюта</th>
+                    </tr>
+                    {% for account in accounts %}
+                    <tr class="account__table-row">
+                        <td class="account__table-column">{{ account.account_name }}</td>
+                        <td class="account__table-column">{{ account.balance }}</td>
+                        <td class="account__table-column">{{ account.currency.currency_name }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="account__no-text">Кажется у вас нет счетов.</p>
+            {% endif %}
+
+            <form action="/create_account" method="post">
+                <div class="form__container form__btn_container">
+                    <button class="btn account__btn">Создать новый</button>
+                </div>
+            </form>
+
+{#            <div class="form__container form__btn_container">#}
+{#                <button class="btn account__btn">Создать новый</button>#}
+{#            </div>#}
+        </div>
+    </div>
+{% endblock %}

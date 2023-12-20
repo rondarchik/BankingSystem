@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, DateField, RadioField, SelectField
+from wtforms import StringField, FloatField, PasswordField, SubmitField, DateField, RadioField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 
@@ -38,3 +38,10 @@ class ProfileEditForm(FlaskForm):
 
     submit = SubmitField('Сохранить изменения')
 
+
+class BankAccountForm(FlaskForm):
+    account_name = StringField('Название счета', validators=[DataRequired()])
+    balance = FloatField('Баланс', default=0.0)
+    currency = SelectField('Валюта', choices=[], validators=[DataRequired()])
+
+    submit = SubmitField('Сохранить')

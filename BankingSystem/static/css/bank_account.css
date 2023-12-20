@@ -1,0 +1,149 @@
+.account__container {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.account__content {
+    border-radius: 25px;
+    border: 1px solid #999999;
+    width: 1200px;
+    display: block;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.account__title {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.account__rate-title {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 28px;
+}
+
+.account__no-text {
+    font-weight: 300;
+    font-size: 24px;
+    margin-left: 20px;
+}
+
+.account__btn {
+    width: 50%;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.account__table {
+    width: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-collapse: collapse;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.account__table-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.account__table-column_header {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.account__table-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+th, td {
+    width: 33.33%;
+    padding: 10px;
+    /*border: 1px solid #999999;*/
+}
+
+th + th, td + td {
+    border-left: 1px solid #999999; /* Добавляет границы слева от ячеек, кроме первой */
+}
+
+tr + tr {
+    border-top: 1px solid #999999; /* Добавляет границы сверху от строк, кроме первой */
+}
+
+tbody {
+    width: 100%;
+}
+
+.form-account {
+    display: block;
+}
+
+.account-form__select {
+    font-size: 15px;
+    width: 75%;
+    background: #ffffff;
+    color: #000000;
+    height: 50px;
+    border-radius: 25px;
+    border: 1px solid #000000;
+    padding: 0 30px 0 30px;
+}
+
+.form__container-acc {
+    width: 33.33%;
+    z-index: 1;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.form__account-group {
+    display: flex;
+    line-height: 1.5;
+}
+
+.form__btn_container-acc {
+    width: 50%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.account__form-input {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #000000;
+    display: block;
+    width: 75%;
+    background: #ffffff;
+    height: 50px;
+    border-radius: 25px;
+    padding: 0 30px 0 30px;
+    border: 1px solid #000000;
+}

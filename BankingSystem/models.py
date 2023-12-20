@@ -94,6 +94,9 @@ class BankAccount(db.Model):
     balance = db.Column(db.Float, default=0.0)
     account_name = db.Column(db.String(50), nullable=False)
 
+    user = db.relationship('User', foreign_keys=[user_id])
+    currency = db.relationship('Currency', foreign_keys=[currency_id])
+
 
 class Category(db.Model):
     __tablename__ = 'Categories'

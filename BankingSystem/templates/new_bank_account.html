@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Новый счет{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Создание нового счета</b></h1>
+            </div>
+
+            <form method="POST" class="form-account">
+                {{ form.hidden_tag() }}
+
+                <div class="form__account-group">
+                    <div class="form__container-acc form__input-container">
+                        <input class="account__form-input" type="text" name="account_name"
+                               placeholder="{{ form.account_name.label.text }}">
+                    </div>
+
+                    <div class="form__container-acc form__input-container">
+                        <input class="account__form-input" type="number" name="balance"
+                               placeholder="{{ form.balance.label.text }}">
+                    </div>
+
+                    <div class="form__container-acc form__input-container" id="currency" >
+                        <select class="account-form__select" name="currency">
+                            {% for currency in form.currency.choices %}
+                                <option value="{{ currency[0] }}">{{ currency[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form__container form__btn_container-acc">
+                    <button class="btn account__btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
