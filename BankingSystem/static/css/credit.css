@@ -1,17 +1,20 @@
 .form__credit-group {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    /* display: block; */
+    /* margin-right: auto; */
+    /* margin-left: auto; */
 }
 
 .form__credit-group-elem {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-left: 10px;
     margin-right: 10px;
-    width: 250px;
+    width: 50%;
 }
 
 .form__container-credit {

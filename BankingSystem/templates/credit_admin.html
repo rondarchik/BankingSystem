@@ -6,34 +6,32 @@
     <div class="container account__container">
         <div class="credit-admin__content">
             <div class="account__title">
-                <h1 class="account__rate-title"><b>Кредиты</b></h1>
+                <h1 class="account__rate-title"><b>Заявки на кредиты</b></h1>
             </div>
 
             {%  if applications %}
                 <table class="credit-admin__table">
                     <tr class="account__table-row">
-                        <td class="account__table-column_header">Сумма</td>
+                        <td class="account__table-column_header">Запрошенная сумма</td>
+                        <td class="account__table-column_header">Тип кредита</td>
                         <td class="account__table-column_header">Процентная ставка</td>
-                        <td class="account__table-column_header">Срок (мес.)</td>
+                        <td class="account__table-column_header">MAX срок (мес.)</td>
                         <td class="account__table-column_header">Дата запроса</td>
                         <td class="account__table-column_header">Пользователь</td>
                         <td class="account__table-column_header">Почта</td>
-                        <td class="account__table-column_header">Номер телефона</td>
-                        <td class="account__table-column_header">Дата рождения</td>
                         <td class="account__table-column_header">Статус</td>
                     </tr>
                     {% for apps in applications %}
                         <tr class="account__table-row">
                         <td class="account__table-column">{{ apps.amount }}</td>
-                        <td class="account__table-column">{{ apps.interest_rate }}</td>
-                        <td class="account__table-column">{{ apps.date_term }}</td>
+                        <td class="account__table-column">{{ apps.type.type_name }}</td>
+                        <td class="account__table-column">{{ apps.type.interest_rate }}</td>
+                        <td class="account__table-column">{{ apps.type.term }}</td>
                         <td class="account__table-column">{{ apps.request_date.strftime('%Y-%m-%d') }}</td>
                         <td class="account__table-column">
                             {{ apps.user.last_name + ' ' + apps.user.first_name + ' ' + apps.user.patronymic }}
                         </td>
                         <td class="account__table-column">{{ apps.user.email }}</td>
-                        <td class="account__table-column">{{ apps.user.phone_number }}</td>
-                        <td class="account__table-column">{{ apps.user.birth_date }}</td>
                         <form method="POST" action="/update_status">
                             <td class="account__table-column">
                                 {% if not apps.status %}
@@ -48,7 +46,7 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <p class="account__no-text">Заявок на кредит нет.</p>
+                <p class="account__no-text">Заявок на кредиты нет.</p>
             {% endif %}
         </div>
     </div>

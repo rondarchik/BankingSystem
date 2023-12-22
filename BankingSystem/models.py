@@ -101,8 +101,10 @@ class BankAccount(db.Model):
 class Category(db.Model):
     __tablename__ = 'Categories'
     id = db.Column(db.Integer, primary_key=True)
-    currency_name = db.Column(db.String(50), nullable=False)
+    category_name = db.Column(db.String(50), nullable=False)
     type_id = db.Column(db.Integer, db.ForeignKey('CategoryTypes.id'), nullable=False)  # default?
+
+    type = db.relationship('CategoryType', foreign_keys=[type_id])
 
 
 class CategoryType(db.Model):
@@ -141,14 +143,26 @@ class CreditRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     amount = db.Column(db.Float)
-    interest_rate = db.Column(db.Float, default=0.1)
+    # interest_rate = db.Column(db.Float, default=0.1)
     department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'), nullable=False)
     status = db.Column(db.Boolean, default=False)
     request_date = db.Column(db.DateTime, default=datetime.now)
-    date_term = db.Column(db.Integer)
+    type_id = db.Column(db.Integer, db.ForeignKey('CreditTypes.id'))
+    # date_term = db.Column(db.Integer)
 
     user = db.relationship('User', foreign_keys=[user_id])
     department = db.relationship('Department', foreign_keys=[department_id])
+    type = db.relationship('CreditType', foreign_keys=[type_id])
+
+
+class CreditType(db.Model):
+    __tablename__ = 'CreditTypes'
+    id = db.Column(db.Integer, primary_key=True)
+    type_name = db.Column(db.String(50), nullable=False)
+    min_amount = db.Column(db.Float, default=0.0)
+    max_amount = db.Column(db.Float, default=0.0)
+    interest_rate = db.Column(db.Float, default=0.0)
+    term = db.Column(db.Integer, default=0)
 
 
 class Deposit(db.Model):

@@ -1,0 +1,18 @@
+#transaction__form1 {
+    display: block;
+}
+
+#transaction__form2 {
+    display: none;
+}
+
+#transaction__form3 {
+    display: none;
+}
+
+.form__transaction {
+    display: flex;
+    widht: 100%;
+    align-items: center;
+    justify-content: center;
+}

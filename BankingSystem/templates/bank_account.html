@@ -9,19 +9,19 @@
                 <h1 class="account__rate-title"><b>Счета</b></h1>
             </div>
 
-            {%  if accounts %}
+            {%  if user_accounts %}
                 <table class="account__table">
                     <tr class="account__table-row">
                         <th class="account__table-column_header">Название счета</th>
                         <th class="account__table-column_header">Баланс</th>
                         <th class="account__table-column_header">Валюта</th>
                     </tr>
-                    {% for account in accounts %}
-                    <tr class="account__table-row">
-                        <td class="account__table-column">{{ account.account_name }}</td>
-                        <td class="account__table-column">{{ account.balance }}</td>
-                        <td class="account__table-column">{{ account.currency.currency_name }}</td>
-                    </tr>
+                    {% for account in user_accounts %}
+                        <tr class="account__table-row">
+                            <td class="account__table-column">{{ account.account_name }}</td>
+                            <td class="account__table-column">{{ account.balance }}</td>
+                            <td class="account__table-column">{{ account.currency.currency_name }}</td>
+                        </tr>
                     {% endfor %}
                 </table>
             {% else %}

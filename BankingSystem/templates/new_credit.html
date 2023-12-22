@@ -11,30 +11,43 @@
 
             <form method="POST" class="form-account">
                 {{ form.hidden_tag() }}
+
                 <div class="form__credit-group">
                     <div class="form__credit-group-elem">
-                         <div class="form__container-credit form__input-container">
-                             <input class="profile__form-input" type="number" name="amount"
-                                    placeholder="{{ form.amount.label.text }}">
-                         </div>
                         <div class="form__container-credit form__input-container">
-                             <input class="profile__form-input" type="number" step="0.01" name="interest_rate"
-                                    placeholder="{{ form.interest_rate.label.text }}">
-                         </div>
-                    </div>
-                    <div class="form__credit-group-elem">
-                        <div class="form__container-credit form__input-container">
-                            <input class="profile__form-input" type="number" name="term"
-                                   placeholder="{{ form.term.label.text }}">
+                            <input class="profile__form-input" type="number" name="amount"
+                                   placeholder="{{ form.amount.label.text }}">
                         </div>
 
-                        <div class="form__container-credit form__input-container" id="currency" >
+                        <div class="form__container-credit form__input-container" id="credit_type" >
+                            <select class="profile-form__select" name="credit_type">
+                                {% for type in form.credit_type.choices %}
+                                    <option value="{{ type[0] }}">
+                                        {{ type[1] }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form__account-group">
+                        <div class="form__container-credit form__input-container">
+                            <input class="profile__form-input" type="number" name="term"
+                                   placeholder="{{ form.term.label.text }}" disabled>
+                        </div>
+
+                        <div class="form__container-credit form__input-container">
+                             <input class="profile__form-input" type="number" step="0.01" name="interest_rate"
+                                    placeholder="{{ form.interest_rate.label.text }}" disabled>
+                        </div>
+
+                        <div class="form__container-credit form__input-container" id="department" >
                             <select class="profile-form__select" name="department">
                                 {% for dept in form.department.choices %}
                                     <option value="{{ dept[0] }}">{{ dept[1] }}</option>
                                 {% endfor %}
                             </select>
                         </div>
+
                     </div>
                 </div>
 
@@ -44,4 +57,40 @@
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Вызов функции после полной загрузки страницы
+            initializeCreditType();
+
+            // Обработчик изменения значения в поле "credit_type"
+            $('#credit_type select').change(function() {
+                initializeCreditType();
+            });
+
+            // Определение функции для получения данных и обновления полей
+            function initializeCreditType() {
+                var selectedType = $('#credit_type select').val();
+
+                // Выполните Ajax-запрос на сервер, чтобы получить данные для выбранного типа
+                $.ajax({
+                    url: '/get_credit_data/' + selectedType,
+                    type: 'GET',
+                    success: function(data) {
+                        // Обновите значения полей "interest_rate" и "term" в соответствии с полученными данными
+                        $('input[name="interest_rate"]').val(data.interest_rate);
+                        $('input[name="term"]').val(data.term);
+
+                        // Установите значения для атрибутов min и max для поля "amount"
+                        $('input[name="amount"]').attr('min', data.min_amount);
+                        $('input[name="amount"]').attr('max', data.max_amount);
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

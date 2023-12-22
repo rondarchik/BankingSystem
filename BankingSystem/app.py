@@ -10,7 +10,6 @@ from models import *
 from forms import *
 from init_db import db
 
-
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -134,20 +133,23 @@ def role_required(role):
                 logout()
                 return redirect(url_for('login', next=request.url))
             return f(*args, **kwargs)
+
         return decorated_function
+
     return decorator
 
 
-def get_user_accounts(user_id):
-    user_accounts = BankAccount.query.filter_by(user_id=user_id).all()
+def get_user_accounts(user):
+    user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
     return user_accounts
+
 
 @app.route('/bank_account', methods=['POST', 'GET'])
 @login_required
 # @role_required('Клиент')
 def bank_account():
-    user_accounts = get_user_accounts(current_user.id)
-    return render_template('bank_account.html', accounts=user_accounts)
+    user_accounts = get_user_accounts(current_user)
+    return render_template('bank_account.html', user_accounts=user_accounts)
 
 
 @app.route('/create_account', methods=['POST', 'GET'])
@@ -195,25 +197,43 @@ def credit():
     return render_template('credit.html', credits=credits, applications=applications)
 
 
+@app.route('/get_credit_data/<int:credit_type_id>', methods=['GET'])
+def get_credit_data(credit_type_id):
+    credit_type = CreditType.query.get(credit_type_id)
+
+    if credit_type:
+        data = {
+            'interest_rate': credit_type.interest_rate,
+            'term': credit_type.term,
+            'min_amount': credit_type.min_amount,
+            'max_amount': credit_type.max_amount,
+        }
+        return jsonify(data)
+    else:
+        return jsonify({'error': 'Credit type not found'}), 404
+
+
 @app.route('/create_credit', methods=['POST', 'GET'])
 @login_required
-# @role_required('Клиент')
 def create_credit():
     form = CreditRequestForm()
 
     departments = Department.query.with_entities(Department.id, Department.department_address).all()
     form.department.choices = [(dept.id, dept.department_address) for dept in departments]
 
+    types = CreditType.query.all()
+    form.credit_type.choices = [(_type.id, _type.type_name, _type.min_amount,
+                                _type.max_amount, _type.interest_rate, _type.term) for _type in types]
+
     if form.validate_on_submit():
-        appliction = CreditRequest(
+        application = CreditRequest(
             user_id=current_user.id,
             amount=form.amount.data,
-            interest_rate=form.interest_rate.data,
-            date_term=form.term.data,
             department_id=form.department.data,
+            type_id=form.credit_type.data
         )
 
-        db.session.add(appliction)
+        db.session.add(application)
         db.session.commit()
         return redirect(url_for('credit'))
     else:
@@ -265,6 +285,29 @@ def credit_admin():
     return render_template('credit_admin.html', applications=applications)
 
 
+def get_user_accounts(user):
+    user_accounts = BankAccount.query.filter_by(user=user).all()
+    return user_accounts
+
+
+@app.route('/transaction', methods=['POST', 'GET'])
+@login_required
+def transaction():
+    # radio_value = request.form.get('transaction')
+    # if radio_value == 'transaction__form1':
+    #     form = TransferTransactionForm()
+    #
+    #     user_accounts = get_user_accounts(current_user.id)
+    #     form.from_account.choices = [(acc.id, acc.name) for acc in user_accounts]
+    #
+    # elif radio_value == 'transaction__form2':
+    #     pass
+    # elif radio_value == 'transaction__form3':
+    #     pass
+
+    return render_template('transaction.html')
+
+
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile():
@@ -287,7 +330,7 @@ def profile():
             if user_role == 'Админ':
                 admin = Admin.query.filter_by(id=current_user.id).first()
                 dept = (Department.query.with_entities(Department.id, Department.department_address)
-                    .filter(Department.id == admin.department_id).all())
+                        .filter(Department.id == admin.department_id).all())
 
         if form.validate_on_submit():
             # user.username = form.username.data  - я сделала так, что изменять нельзя, потому что кому нужны эти заморочки
@@ -343,7 +386,7 @@ def get_rates(to_currency, from_currency):
         date=latest_date,
         to_currency_id=Currency.query.filter_by(currency_name=to_currency).first().id,
         from_currency_id=Currency.query.filter_by(currency_name=from_currency).first().id)
-    .first())
+                    .first())
 
     return latest_rates.rate
 
