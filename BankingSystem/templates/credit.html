@@ -9,6 +9,10 @@
                 <h1 class="account__rate-title"><b>Кредиты</b></h1>
             </div>
 
+            {% for msg in get_flashed_messages() %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+
             {%  if credits or applications %}
                 <table class="account__table">
                     <tr class="account__table-row">

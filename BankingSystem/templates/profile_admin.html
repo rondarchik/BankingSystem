@@ -1,0 +1,98 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <div class="container profile__container">
+        <div class="profile__content">
+            <div class="profile__title">
+                <h1 class="profile__rate-title"><b>Личный кабинет пользователя</b></h1>
+            </div>
+
+            <form method="POST" class="form-register">
+                {{ form.hidden_tag() }}
+
+                <div class="profile__form-group">
+                    <div class="form__group-elem">
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="username"
+                                   value="{{ form.username.data or '' }}"
+                                   placeholder="{{ form.username.label.text}}" readonly>
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="email"
+                                   value="{{ form.email.data or '' }}"
+                                   placeholder="{{ form.email.label.text}}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="first_name"
+                                   value="{{ form.first_name.data or '' }}"
+                                   placeholder="{{ form.first_name.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="last_name"
+                                   value="{{ form.last_name.data or '' }}"
+                                   placeholder="{{ form.last_name.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="patronymic"
+                                   value="{{ form.patronymic.data or '' }}"
+                                   placeholder="{{ form.patronymic.label.text }}">
+                        </div>
+                    </div>
+                    <div class="form__group-elem">
+                        <div class="form__container form__input-container">
+                            <input class="profile-form__input-date" type="date" name="birth_date" id="dateField"
+                                   value="{{ form.birth_date.data }}"
+                                   placeholder="{{ form.birth_date.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container">
+                            <input class="profile__form-input" type="text" name="phone_number" id="phone_number"
+                                   value="{{ form.phone_number.data or '' }}"
+                                   placeholder="{{ form.phone_number.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container" >
+                            <input class="profile__form-input" type="password" name="password"
+                                   placeholder="{{ form.password.label.text }}">
+                        </div>
+
+                        <div class="form__container form__input-container" >
+                            <input class="profile__form-input" type="password" name="confirm_password"
+                                   placeholder="{{ form.confirm_password.label.text }}">
+                        </div>
+
+                        {% if current_user.is_authenticated and user_role == 'Админ' %}
+                            <div class="form__container form__input-container" id="department">
+                                <select class="profile-form__select" name="department" disabled>
+                                    {% for d in dept %}
+                                        <option value="{{ d[0] }}">{{ d[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <div class="form__text" id="client_field" style="display: none;">
+                            <p class="form__not-required-text">Поля помеченные * обязательны к заполнению</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__container form__btn_container">
+                    <button class="profile-form__btn" type="submit"><b>Сохранить изменения</b></button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+    </script>
+{% endblock %}

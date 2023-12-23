@@ -124,21 +124,6 @@ def register():
     return render_template('register.html', form=form)
 
 
-def role_required(role):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
-            if user_role != role:
-                logout()
-                return redirect(url_for('login', next=request.url))
-            return f(*args, **kwargs)
-
-        return decorated_function
-
-    return decorator
-
-
 def get_user_accounts(user):
     user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
     return user_accounts
@@ -154,7 +139,6 @@ def bank_account():
 
 @app.route('/create_account', methods=['POST', 'GET'])
 @login_required
-# @role_required('Клиент')
 def create_account():
     form = BankAccountForm()
 
@@ -186,7 +170,6 @@ def get_user_credits_and_applications(user):
 
 @app.route('/credit', methods=['POST', 'GET'])
 @login_required
-# @role_required('Клиент')
 def credit():
     credits, applications = get_user_credits_and_applications(current_user.id)
 
@@ -224,6 +207,16 @@ def create_credit():
     types = CreditType.query.all()
     form.credit_type.choices = [(_type.id, _type.type_name, _type.min_amount,
                                 _type.max_amount, _type.interest_rate, _type.term) for _type in types]
+
+    if current_user.get_age() < 18:
+        flash('Вам должно быть не менее 18 лет, чтобы подать заявку на кредит.',
+              'error')
+        return redirect(url_for('credit'))
+    elif (current_user.phone_number or current_user.first_name
+          or current_user.last_name or current_user.patronymic) == '':
+        flash('Не достаточно личных данных.',
+              'error')
+        return redirect(url_for('credit'))
 
     if form.validate_on_submit():
         application = CreditRequest(
@@ -278,7 +271,6 @@ def update_credit_request():
 
 @app.route('/credit_admin', methods=['POST', 'GET'])
 @login_required
-# @role_required('Клиент')
 def credit_admin():
     applications = get_admin_credits_and_applications(current_user.id)
 
@@ -349,6 +341,9 @@ def profile():
         else:
             print(form.errors)
 
+        if user_role == 'Админ':
+            return render_template('profile_admin.html', form=form, user_role=user_role, dept=dept)
+
     return render_template('profile.html', form=form, user_role=user_role, dept=dept)
 
 
@@ -361,14 +356,12 @@ def convert():
     input_currency2 = data['input_currency2']
 
     if input_currency1:
-        # Конвертируем из currency1 в currency2
         amount = float(input_currency1)
         from_currency = currency1
         to_currency = currency2
         rate = get_rates(to_currency, from_currency)
         converted_amount = float(amount) / rate
     elif input_currency2:
-        # Конвертируем из currency2 в currency1
         amount = float(input_currency2)
         from_currency = currency2
         to_currency = currency1

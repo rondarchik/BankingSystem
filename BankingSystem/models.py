@@ -1,5 +1,5 @@
-from datetime import datetime
-from flask_login import UserMixin, AnonymousUserMixin
+from datetime import datetime, date
+from flask_login import UserMixin
 from init_db import db
 from werkzeug.security import generate_password_hash,  check_password_hash
 
@@ -21,6 +21,11 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def get_age(self):
+        today = date.today()
+        birth_date = self.birth_date
+        return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
 
 class Client(db.Model):
@@ -73,17 +78,11 @@ class CurrencyRate(db.Model):
     from_currency_id = db.Column(db.Integer, db.ForeignKey('Currencies.id'), nullable=False)
     to_currency_id = db.Column(db.Integer, db.ForeignKey('Currencies.id'), nullable=False)
     rate = db.Column(db.Float, nullable=False)
-    rate_type = db.Column(db.Integer, db.ForeignKey('RateTypes.id'), nullable=False)
+    scale = db.Column(db.Integer, default=0)
     date = db.Column(db.DateTime, nullable=False)
 
     from_currency = db.relationship('Currency', foreign_keys=[from_currency_id])
     to_currency = db.relationship('Currency', foreign_keys=[to_currency_id])
-
-
-class RateType(db.Model):
-    __tablename__ = 'RateTypes'
-    id = db.Column(db.Integer, primary_key=True)
-    type_name = db.Column(db.String(50), nullable=False)
 
 
 class BankAccount(db.Model):

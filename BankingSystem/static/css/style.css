@@ -93,3 +93,12 @@ fieldset {
     font-size: 20px;
     color: #FFFFFF;
 }
+
+.flash {
+    color: red;
+    text-align: center;
+    font-weight: 300;
+    font-size: 24px;
+    margin-left: 20px;
+    padding-bottom: 20px;
+}
