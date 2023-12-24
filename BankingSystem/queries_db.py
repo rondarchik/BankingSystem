@@ -1,4 +1,4 @@
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from models import *
 
 
@@ -76,3 +76,30 @@ def get_user_deposits(user):
     user_deposits = Deposit.query.filter_by(user_id=user.id, is_closed=False).all()
     return user_deposits
 
+
+# def get_user_transactions(user):
+#     user_transactions = (
+#         Transaction.query
+#         .join(BankAccount,
+#               (BankAccount.id == Transaction.from_account_id) | (BankAccount.id == Transaction.to_account_id))
+#         .filter(BankAccount.user_id == user.id)
+#         .all()
+#     )
+#     return user_transactions
+
+
+def get_user_transactions(user, date_filter=None, period_start=None, period_end=None):
+    query = Transaction.query.join(BankAccount, (BankAccount.id == Transaction.from_account_id) | (
+                BankAccount.id == Transaction.to_account_id))
+
+    query = query.filter(BankAccount.user_id == user.id)
+
+    if date_filter:
+        query = query.filter(func.date(Transaction.transaction_date) == date_filter.date())
+
+    if period_start and period_end:
+        query = query.filter(Transaction.transaction_date.between(period_start, period_end))
+
+    user_transactions = query.all()
+
+    return user_transactions

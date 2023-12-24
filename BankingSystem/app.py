@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
-from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
+from datetime import date, timedelta
+from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -406,6 +407,28 @@ def create_deposit():
         print(form.errors)
 
     return render_template('new_deposit.html', form=form)
+
+
+@app.route('/transactions', methods=['POST', 'GET'])
+@login_required
+def transactions():
+    date_filter = request.args.get('date_filter')
+    date_filter_date = datetime.strptime(date_filter, '%Y-%m-%d') if date_filter else None
+
+    period_start = request.args.get('period_start')
+    period_start_date = datetime.strptime(period_start, '%Y-%m-%d') if period_start else None
+
+    period_end = request.args.get('period_end')
+    period_end_date = datetime.strptime(period_end, '%Y-%m-%d') if period_end else None
+
+    user_transactions = get_user_transactions(
+        current_user,
+        date_filter=date_filter_date,
+        period_start=period_start_date,
+        period_end=period_end_date
+    )
+
+    return render_template('transactions.html', user_transactions=user_transactions)
 
 
 @app.route('/transfer_transaction', methods=['POST', 'GET'])

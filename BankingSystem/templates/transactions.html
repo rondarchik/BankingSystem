@@ -1,10 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}История платежей{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            {%  if user_transactions %}
+                <div class="transaction-filter">
+                    <form method="GET" class="form-filter">
+                        <label for="date_filter">Выберите день:</label>
+                        <input type="date" id="date_filter" name="date_filter" class="trans-form__input-date">
+                        <button type="submit" class="trans-form__btn">Применить</button>
+                    </form>
+                    <form method="GET" class="form-filter">
+                        <label for="period_start">Начало периода:</label>
+                        <input type="date" id="period_start" name="period_start" class="trans-form__input-date">
+                        <label for="period_end">Конец периода:</label>
+                        <input type="date" id="period_end" name="period_end" class="trans-form__input-date">
+                        <button type="submit" class="trans-form__btn">Применить</button>
+                    </form>
+                </div>
+
+                <table class="account__table">
+                    <tr class="account__table-row">
+                        <th class="account__table-column_header">'From' счет</th>
+                        <th class="account__table-column_header">'To' счет</th>
+                        <th class="account__table-column_header">Сумма</th>
+                        <th class="account__table-column_header">Дата</th>
+                        <th class="account__table-column_header">Категория</th>
+                    </tr>
+                    {% for trans in user_transactions %}
+                        <tr class="account__table-row">
+                            <td class="account__table-column">{{ trans.from_account.account_name or '' }}</td>
+                            <td class="account__table-column">{{ trans.to_account.account_name or '' }}</td>
+                            <td class="account__table-column">{{ trans.amount }}</td>
+                            <td class="account__table-column">{{ trans.transaction_date.strftime('%Y-%m-%d') }}</td>
+                            <td class="account__table-column">{{ trans.category.category_name }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="account__no-text">Ваша история транзакций пуста.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

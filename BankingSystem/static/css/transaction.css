@@ -82,3 +82,30 @@
 .form-trans {
     display: block;
 }
+
+.form-filter {
+    margin-left: 150px;
+    margin-bottom: 20px;
+    font-size: 17px;
+}
+
+.trans-form__input-date {
+    font-size: 17px;
+    width: 15%;
+    background: #ffffff;
+    color: #000000;
+    height: 25px;
+    border-radius: 25px;
+    border: 1px solid #000000;
+    padding: 0 10px 0 10px;
+}
+
+.trans-form__btn {
+    width: 15%;
+    height: 25px;
+    border-radius: 25px;
+    padding: 0 25px;
+    background: #365ABA;
+    color: #FFFFFF;
+    font-size: 17px;
+}

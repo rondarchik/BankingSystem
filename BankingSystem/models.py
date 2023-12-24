@@ -124,6 +124,10 @@ class Transaction(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('Categories.id'), nullable=False)
     status = db.Column(db.Boolean, default=False)
 
+    from_account = db.relationship('BankAccount', foreign_keys=[from_account_id])
+    to_account = db.relationship('BankAccount', foreign_keys=[to_account_id])
+    category = db.relationship('Category', foreign_keys=[category_id])
+
 
 class Credit(db.Model):
     __tablename__ = 'Credits'
