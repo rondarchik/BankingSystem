@@ -1,6 +1,6 @@
 from datetime import date
 from functools import wraps
-from sqlalchemy import event
+from sqlalchemy import event, desc
 from dateutil.relativedelta import relativedelta
 from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_migrate import Migrate
@@ -277,14 +277,14 @@ def credit_admin():
 
 
 def get_user_deposits(user):
-    user_deposits = Deposit.query.filter_by(user_id=user).all()
+    user_deposits = Deposit.query.filter_by(user_id=user.id).all()
     return user_deposits
 
 
 @app.route('/deposit', methods=['POST', 'GET'])
 @login_required
 def deposit():
-    deposits = get_user_deposits(current_user.id)
+    deposits = get_user_deposits(current_user)
 
     return render_template('deposit.html', deposits=deposits)
 
@@ -302,6 +302,21 @@ def get_deposit_data(deposit_type_id):
         return jsonify(data)
     else:
         return jsonify({'error': 'Deposit type not found'}), 404
+
+
+def get_account_for_deposit_trans(user, sum):
+    account = BankAccount.query.filter(
+        BankAccount.user_id == user.id,
+        BankAccount.currency_id == Currency.query.filter_by(currency_name='BYN').first().id,
+        BankAccount.balance >= sum
+    ).order_by(desc(BankAccount.balance)).first()
+
+    return account
+
+
+def get_category_for_deposit_trans():
+    category_id = Category.query.filter_by(category_name='Пополнение вклада').first().id
+    return category_id
 
 
 @app.route('/create_deposit', methods=['POST', 'GET'])
@@ -324,24 +339,41 @@ def create_deposit():
         return redirect(url_for('deposit'))
 
     if form.validate_on_submit():
-        # print(date.today() + relativedelta(months=+form.term.data))
-        # print()
-        new_deposit = Deposit(
-            user_id=current_user.id,
-            amount=form.amount.data,
-            type_id=form.deposit_type.data,
-            start_date=date.today(),
-            end_date=date.today(),
-            is_closed=False
-        )
+        amount = form.amount.data
+        account = get_account_for_deposit_trans(current_user, amount)
+        if account:
+            new_deposit = Deposit(
+                user_id=current_user.id,
+                amount=amount,
+                type_id=form.deposit_type.data,
+                start_date=date.today(),
+                end_date=date.today(),
+                is_closed=False
+            )
 
-        db.session.add(new_deposit)
-        db.session.commit()
+            db.session.add(new_deposit)
+            db.session.commit()
 
-        new_deposit.end_date = date.today() + relativedelta(months=+new_deposit.type.term),
-        db.session.commit()
+            new_deposit.end_date = date.today() + relativedelta(months=+new_deposit.type.term),
+            db.session.commit()
 
-        return redirect(url_for('deposit'))
+            new_transaction = Transaction(
+                from_account_id=account.id,
+                amount=amount,
+                transaction_date=date.today(),
+                category_id=get_category_for_deposit_trans(),
+                status=True,
+            )
+
+            account.balance -= amount
+
+            db.session.add(new_transaction)
+            db.session.commit()
+
+            return redirect(url_for('deposit'))
+        else:
+            flash('Не существует счета в валюте BYN или недостаточно средств.',
+                  'error')
     else:
         print(form.errors)
 

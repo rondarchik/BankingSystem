@@ -9,6 +9,10 @@
                 <h1 class="account__rate-title"><b>Оформление заявки на вклад</b></h1>
             </div>
 
+            {% for msg in get_flashed_messages() %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+
             <form method="POST" class="form-account">
                 {{ form.hidden_tag() }}
 
