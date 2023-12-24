@@ -17,12 +17,15 @@
                     <img class="header__logo" src="static/images/bank-logo.svg" alt="Логотип банкинга">
                 </a>
 
-                <nav class="nav header__nav-navigation">
-                    <a href="/bank_account"  class="nav__link nav__btn">Счета</a>
-                    <a href="/transfer_transaction" class="nav__link nav__btn">Платежи</a>
-                    <a href="/credit" class="nav__link nav__btn">Кредиты</a>
-                    <a href="/deposit" class="nav__link nav__btn">Вклады</a>
-                </nav>
+                {% if current_user.is_authenticated %}
+                    <nav class="nav header__nav-navigation">
+                        <a href="/bank_account"  class="nav__link nav__btn">Счета</a>
+                        <a href="/transfer_transaction" class="nav__link nav__btn">Платежи</a>
+                        <a href="/transactions" class="nav__link nav__btn">История платежей</a>
+                        <a href="/credit" class="nav__link nav__btn">Кредиты</a>
+                        <a href="/deposit" class="nav__link nav__btn">Вклады</a>
+                    </nav>
+                {% endif %}
             </div>
 
             <nav class="nav header__nav-auth">

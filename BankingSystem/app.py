@@ -1,14 +1,10 @@
-from datetime import date
-from functools import wraps
-from sqlalchemy import event, desc
 from dateutil.relativedelta import relativedelta
 from flask import Flask, render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
-from models import *
 from forms import *
-from init_db import db
+from queries_db import *
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -197,22 +193,6 @@ def convert():
     return jsonify(converted_amount=converted_amount)
 
 
-def get_rates(to_currency, from_currency):
-    latest_date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
-    latest_rates = (CurrencyRate.query.filter_by(
-        date=latest_date,
-        to_currency_id=Currency.query.filter_by(currency_name=to_currency).first().id,
-        from_currency_id=Currency.query.filter_by(currency_name=from_currency).first().id)
-                    .first())
-
-    return latest_rates.rate
-
-
-def get_user_accounts(user):
-    user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
-    return user_accounts
-
-
 @app.route('/bank_account', methods=['POST', 'GET'])
 @login_required
 def bank_account():
@@ -243,12 +223,6 @@ def create_account():
         print(form.errors)
 
     return render_template('new_bank_account.html', form=form)
-
-
-def get_user_credits_and_applications(user):
-    user_credits = Credit.query.filter_by(user_id=user).all()
-    user_applications = CreditRequest.query.filter_by(user_id=user, status=False).all()
-    return user_credits, user_applications
 
 
 @app.route('/credit', methods=['POST', 'GET'])
@@ -318,17 +292,6 @@ def create_credit():
     return render_template('new_credit.html', form=form)
 
 
-def get_admin_credits_and_applications(user):
-    admin_department_id = Admin.query.filter_by(id=user).first().department_id
-    credit_requests = CreditRequest.query.filter_by(department_id=admin_department_id).all()
-    return credit_requests
-
-
-def get_application(application):
-    credit_requests = CreditRequest.query.filter_by(id=application).first()
-    return credit_requests
-
-
 @app.route('/update_status', methods=['POST'])
 def update_credit_request():
     application_id = request.form.get('app_id')
@@ -361,11 +324,6 @@ def credit_admin():
     return render_template('credit_admin.html', applications=applications)
 
 
-def get_user_deposits(user):
-    user_deposits = Deposit.query.filter_by(user_id=user.id).all()
-    return user_deposits
-
-
 @app.route('/deposit', methods=['POST', 'GET'])
 @login_required
 def deposit():
@@ -387,21 +345,6 @@ def get_deposit_data(deposit_type_id):
         return jsonify(data)
     else:
         return jsonify({'error': 'Deposit type not found'}), 404
-
-
-def get_account_for_deposit_trans(user, sum):
-    account = BankAccount.query.filter(
-        BankAccount.user_id == user.id,
-        BankAccount.currency_id == Currency.query.filter_by(currency_name='BYN').first().id,
-        BankAccount.balance >= sum
-    ).order_by(desc(BankAccount.balance)).first()
-
-    return account
-
-
-def get_category_for_deposit_trans():
-    category_id = Category.query.filter_by(category_name='Пополнение вклада').first().id
-    return category_id
 
 
 @app.route('/create_deposit', methods=['POST', 'GET'])
@@ -465,11 +408,6 @@ def create_deposit():
     return render_template('new_deposit.html', form=form)
 
 
-def get_user_accounts(user):
-    user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
-    return user_accounts
-
-
 @app.route('/transfer_transaction', methods=['POST', 'GET'])
 @login_required
 def transfer_transaction():
@@ -513,18 +451,6 @@ def refill_transaction():
     return render_template('trans_refill.html', form=form)
 
 
-def get_user_credits(user):
-    user_credits = Credit.query.filter_by(user_id=user.id, is_closed=False).all()
-    return user_credits
-
-
-def get_user_byn_accounts(user):
-    user_accounts = BankAccount.query.filter_by(user_id=user.id,
-                                                currency_id=Currency.query.filter_by(currency_name='BYN').first().id,
-                                                ).all()
-    return user_accounts
-
-
 @app.route('/credit_transaction', methods=['POST', 'GET'])
 @login_required
 def credit_transaction():
@@ -564,11 +490,6 @@ def credit_transaction():
         print(form.errors)
 
     return render_template('trans_credit.html', form=form)
-
-
-def get_user_deposits(user):
-    user_deposits = Deposit.query.filter_by(user_id=user.id, is_closed=False).all()
-    return user_deposits
 
 
 @app.route('/deposit_transaction', methods=['POST', 'GET'])
