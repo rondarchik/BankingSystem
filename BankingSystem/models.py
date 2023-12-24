@@ -132,8 +132,10 @@ class Credit(db.Model):
     start_date = db.Column(db.DateTime, default=datetime.now)
     end_date = db.Column(db.DateTime, default=datetime.now)
     is_closed = db.Column(db.Boolean, default=False)
+    request_id = db.Column(db.Integer, db.ForeignKey('CreditsRequests.id'), nullable=False)
 
     user = db.relationship('User', foreign_keys=[user_id])
+    request = db.relationship('CreditRequest', foreign_keys=[request_id])
 
 
 class CreditRequest(db.Model):

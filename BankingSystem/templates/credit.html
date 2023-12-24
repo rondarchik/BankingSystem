@@ -16,6 +16,7 @@
             {%  if credits or applications %}
                 <table class="account__table">
                     <tr class="account__table-row">
+                        <th class="account__table-column_header">Название</th>
                         <th class="account__table-column_header">Сумма</th>
                         <th class="account__table-column_header">Выплаченная сумма</th>
                         <th class="account__table-column_header">Процентная ставка</th>
@@ -25,6 +26,7 @@
                     </tr>
                     {% for credit in credits %}
                     <tr class="account__table-row">
+                        <td class="account__table-column">{{ credit.request.type.type_name }}</td>
                         <td class="account__table-column">{{ credit.amount }}</td>
                         <td class="account__table-column">{{ credit.repaid_amount }}</td>
                         <td class="account__table-column">{{ credit.interest_rate }}</td>
@@ -35,6 +37,7 @@
                     {% endfor %}
                     {% for apps in applications %}
                         <tr class="account__table-row">
+                            <td class="account__table-column">{{ apps.type.type_name }}</td>
                             <td class="account__table-column">{{ apps.amount }}</td>
                             <td class="account__table-column"></td>
                             <td class="account__table-column">{{ apps.type.interest_rate }}</td>

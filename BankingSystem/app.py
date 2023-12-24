@@ -341,10 +341,11 @@ def update_credit_request():
             user_id=application.user.id,
             amount=application.amount,
             repaid_amount=0,
-            interest_rate=application.interest_rate,
+            interest_rate=application.type.interest_rate,
             start_date=date.today(),
-            end_date=date.today() + relativedelta(months=+application.date_term),
-            is_closed=False
+            end_date=date.today() + relativedelta(months=+application.type.term),
+            is_closed=False,
+            request_id=application_id
         )
         db.session.add(new_credit)
         db.session.commit()
@@ -481,13 +482,6 @@ def currency_transaction():
     return render_template('trans_currency.html')
 
 
-def get_payment_categories():
-    selected_category_ids = [2, 3, 6]
-    selected_categories = Category.query.filter(Category.id.in_(selected_category_ids)).all()
-
-    return selected_categories
-
-
 @app.route('/refill_transaction', methods=['POST', 'GET'])
 @login_required
 def refill_transaction():
@@ -517,6 +511,59 @@ def refill_transaction():
         print(form.errors)
 
     return render_template('trans_refill.html', form=form)
+
+
+def get_user_credits(user):
+    user_credits = Credit.query.filter_by(user_id=user.id, is_closed=False).all()
+    return user_credits
+
+
+def get_user_byn_accounts(user):
+    user_accounts = BankAccount.query.filter_by(user_id=user.id,
+                                                currency_id=Currency.query.filter_by(currency_name='BYN').first().id,
+                                                ).all()
+    return user_accounts
+
+
+@app.route('/credit_transaction', methods=['POST', 'GET'])
+@login_required
+def credit_transaction():
+    form = CreditTransactionForm()
+
+    accounts = get_user_byn_accounts(current_user)
+    form.from_account.choices = [(account.id, account.account_name) for account in accounts]
+
+    credits = get_user_credits(current_user)
+    form.credit.choices = [(credit.id, credit.request.type.type_name) for credit in credits]
+
+    if form.validate_on_submit():
+        category_id = Category.query.filter_by(category_name='Оплата кредита').first().id
+        from_account_id = int(request.form['from_account'])
+        account = BankAccount.query.get(from_account_id)
+        credit_id = int(request.form['credit'])
+        credit = Credit.query.get(credit_id)
+
+        if account or account.balance < form.amount.data:
+            new_transaction = Transaction(
+                from_account_id=from_account_id,
+                amount=form.amount.data,
+                transaction_date=date.today(),
+                category_id=category_id,
+                status=True,
+            )
+
+            account.balance -= new_transaction.amount
+            credit.repaid_amount += new_transaction.amount
+
+            db.session.add(new_transaction)
+            db.session.commit()
+        else:
+            flash('Не существует счета в валюте BYN или недостаточно средств.',
+                  'error')
+    else:
+        print(form.errors)
+
+    return render_template('trans_credit.html', form=form)
 
 
 if __name__ == '__main__':

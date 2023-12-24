@@ -1,0 +1,38 @@
+{% extends 'transaction.html' %}
+
+{% block trans_title %}Оплата кредита{% endblock %}
+
+{% block trans_form %}
+{% for msg in get_flashed_messages() %}
+    <div class="flash">{{ msg }}</div>
+{% endfor %}
+
+<form method="POST" class="form-trans">
+    {{ form.hidden_tag() }}
+
+    <div class="form__refill-group">
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="text" name="amount"
+                   placeholder="{{ form.amount.label.text }}">
+        </div>
+        <div class="form__container-acc form__input-container" id="from_account">
+            <select class="trans-form__select" name="from_account">
+                {% for acc in form.from_account.choices %}
+                    <option value="{{ acc[0] }}">{{ acc[1] }}</option>
+                {% endfor %}
+             </select>
+        </div>
+        <div class="form__container-acc form__input-container" id="credit" >
+            <select class="trans-form__select" name="credit">
+                {% for credit in form.credit.choices %}
+                    <option value="{{ credit[0] }}">{{ credit[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form__container form__btn_container-acc">
+        <button class="btn account__btn">Подтвердить</button>
+    </div>
+</form>
+{% endblock %}

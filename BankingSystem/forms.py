@@ -86,3 +86,20 @@ class RefillTransactionForm(FlaskForm):
     amount = FloatField('Сумма', default=0.0)
 
     submit = SubmitField('Подтвердить')
+
+
+class CreditTransactionForm(FlaskForm):
+    from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
+    amount = FloatField('Сумма', default=0.0)
+    credit = SelectField('Кредит пользователя', choices=[], validators=[DataRequired()])
+
+    submit = SubmitField('Подтвердить')
+
+
+class DepositTransactionForm(FlaskForm):
+    from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
+    amount = FloatField('Сумма', default=0.0)
+    deposit = SelectField('Депозит пользователя', choices=[], validators=[DataRequired()])
+
+    submit = SubmitField('Подтвердить')
+

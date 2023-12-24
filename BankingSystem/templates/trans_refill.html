@@ -1,9 +1,9 @@
 {% extends 'transaction.html' %}
 
-{% block trans_title %}Платежи{% endblock %}
+{% block trans_title %}Пополнение счета{% endblock %}
 
 {% block trans_form %}
-<form method="POST" class="form-account">
+<form method="POST" class="form-trans">
     {{ form.hidden_tag() }}
 
     <div class="form__refill-group">
