@@ -543,7 +543,7 @@ def credit_transaction():
         credit_id = int(request.form['credit'])
         credit = Credit.query.get(credit_id)
 
-        if account or account.balance < form.amount.data:
+        if account and account.balance >= form.amount.data:
             new_transaction = Transaction(
                 from_account_id=from_account_id,
                 amount=form.amount.data,
@@ -564,6 +564,52 @@ def credit_transaction():
         print(form.errors)
 
     return render_template('trans_credit.html', form=form)
+
+
+def get_user_deposits(user):
+    user_deposits = Deposit.query.filter_by(user_id=user.id, is_closed=False).all()
+    return user_deposits
+
+
+@app.route('/deposit_transaction', methods=['POST', 'GET'])
+@login_required
+def deposit_transaction():
+    form = DepositTransactionForm()
+
+    accounts = get_user_byn_accounts(current_user)
+    form.from_account.choices = [(account.id, account.account_name) for account in accounts]
+
+    deposits = get_user_deposits(current_user)
+    form.deposit.choices = [(deposit.id, deposit.type.type_name) for deposit in deposits]
+
+    if form.validate_on_submit():
+        category_id = Category.query.filter_by(category_name='Пополнение вклада').first().id
+        from_account_id = int(request.form['from_account'])
+        account = BankAccount.query.get(from_account_id)
+        deposit_id = int(request.form['deposit'])
+        deposit = Deposit.query.get(deposit_id)
+
+        if account and account.balance >= form.amount.data:
+            new_transaction = Transaction(
+                from_account_id=from_account_id,
+                amount=form.amount.data,
+                transaction_date=date.today(),
+                category_id=category_id,
+                status=True,
+            )
+
+            account.balance -= new_transaction.amount
+            deposit.amount += new_transaction.amount
+
+            db.session.add(new_transaction)
+            db.session.commit()
+        else:
+            flash('Не существует счета в валюте BYN или недостаточно средств.',
+                  'error')
+    else:
+        print(form.errors)
+
+    return render_template('trans_deposit.html', form=form)
 
 
 if __name__ == '__main__':
