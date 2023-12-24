@@ -57,16 +57,25 @@ class CreditRequestForm(FlaskForm):
     submit = SubmitField('Отправить')
 
 
+class DepositRequestForm(FlaskForm):
+    amount = FloatField('Сумма', default=0.0)
+    deposit_type = SelectField('Тип кредита', choices=[], validators=[DataRequired()])
+    interest_rate = FloatField('Процентная ставка', default=0.0)
+    term = IntegerField('Длительность', default=0)
+
+    submit = SubmitField('Отправить')
+
+
 class ApproveRequestForm(FlaskForm):
     status = BooleanField('Статус', default=False)
     submit = SubmitField('Ok')
 
 
-class TransferTransactionForm(FlaskForm):
-    from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
-    to_account = StringField('Электронная почта получателя','Электронная почта',
-                             validators=[Email(), DataRequired()])
-    amount = FloatField('Сумма', default=0.0)
-    category = SelectField('Категория перевода', choices=[], validators=[DataRequired()])
-
-    submit = SubmitField('Перевести')
+# class TransferTransactionForm(FlaskForm):
+#     from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
+#     to_account = StringField('Электронная почта получателя','Электронная почта',
+#                              validators=[Email(), DataRequired()])
+#     amount = FloatField('Сумма', default=0.0)
+#     category = SelectField('Категория перевода', choices=[], validators=[DataRequired()])
+#
+#     submit = SubmitField('Перевести')

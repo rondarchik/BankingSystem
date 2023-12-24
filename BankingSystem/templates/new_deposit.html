@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Новый вклад{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Оформление заявки на вклад</b></h1>
+            </div>
+
+            <form method="POST" class="form-account">
+                {{ form.hidden_tag() }}
+
+                <div class="form__credit-group">
+                    <div class="form__credit-group-elem">
+                        <div class="form__container-credit form__input-container">
+                            <input class="profile__form-input" type="number" name="amount"
+                                   placeholder="{{ form.amount.label.text }}">
+                        </div>
+
+                        <div class="form__container-credit form__input-container" id="deposit_type" >
+                            <select class="profile-form__select" name="deposit_type">
+                                {% for type in form.deposit_type.choices %}
+                                    <option value="{{ type[0] }}">
+                                        {{ type[1] }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form__credit-group-elem">
+                        <div class="form__container-credit form__input-container">
+                            <input class="profile__form-input" type="number" name="term"
+                                   placeholder="{{ form.term.label.text }}" disabled>
+                        </div>
+
+                        <div class="form__container-credit form__input-container">
+                             <input class="profile__form-input" type="number" step="0.01" name="interest_rate"
+                                    placeholder="{{ form.interest_rate.label.text }}" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__container form__btn_container-acc">
+                    <button class="btn account__btn">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            initializeDepositType();
+
+            $('#deposit_type select').change(function() {
+                initializeDepositType();
+            });
+
+            function initializeDepositType() {
+                var selectedType = $('#deposit_type select').val();
+                $.ajax({
+                    url: '/get_deposit_data/' + selectedType,
+                    type: 'GET',
+                    success: function(data) {
+                        $('input[name="interest_rate"]').val(data.interest_rate);
+                        $('input[name="term"]').val(data.term);
+                        $('input[name="amount"]').attr('min', data.min_amount);
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

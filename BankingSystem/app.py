@@ -170,13 +170,13 @@ def get_user_credits_and_applications(user):
 @app.route('/credit', methods=['POST', 'GET'])
 @login_required
 def credit():
-    credits, applications = get_user_credits_and_applications(current_user.id)
+    new_credits, applications = get_user_credits_and_applications(current_user.id)
 
     user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
     if user_role == 'Админ':
         return render_template('credit_admin.html')
 
-    return render_template('credit.html', credits=credits, applications=applications)
+    return render_template('credit.html', credits=new_credits, applications=applications)
 
 
 @app.route('/get_credit_data/<int:credit_type_id>', methods=['GET'])
@@ -253,7 +253,7 @@ def update_credit_request():
     if application:
         application.status = True
 
-        credit = Credit(
+        new_credit = Credit(
             user_id=application.user.id,
             amount=application.amount,
             repaid_amount=0,
@@ -262,7 +262,7 @@ def update_credit_request():
             end_date=date.today() + relativedelta(months=+application.date_term),
             is_closed=False
         )
-        db.session.add(credit)
+        db.session.add(new_credit)
         db.session.commit()
 
     return redirect(url_for('credit_admin'))
@@ -274,6 +274,78 @@ def credit_admin():
     applications = get_admin_credits_and_applications(current_user.id)
 
     return render_template('credit_admin.html', applications=applications)
+
+
+def get_user_deposits(user):
+    user_deposits = Deposit.query.filter_by(user_id=user).all()
+    return user_deposits
+
+
+@app.route('/deposit', methods=['POST', 'GET'])
+@login_required
+def deposit():
+    deposits = get_user_deposits(current_user.id)
+
+    return render_template('deposit.html', deposits=deposits)
+
+
+@app.route('/get_deposit_data/<int:deposit_type_id>', methods=['GET'])
+def get_deposit_data(deposit_type_id):
+    deposit_type = DepositType.query.get(deposit_type_id)
+
+    if deposit_type:
+        data = {
+            'interest_rate': deposit_type.interest_rate,
+            'term': deposit_type.term,
+            'min_amount': deposit_type.min_amount,
+        }
+        return jsonify(data)
+    else:
+        return jsonify({'error': 'Deposit type not found'}), 404
+
+
+@app.route('/create_deposit', methods=['POST', 'GET'])
+@login_required
+def create_deposit():
+    form = DepositRequestForm()
+
+    types = DepositType.query.all()
+    form.deposit_type.choices = [(_type.id, _type.type_name, _type.min_amount,
+                                  _type.interest_rate, _type.term) for _type in types]
+
+    if current_user.get_age() < 18:
+        flash('Вам должно быть не менее 18 лет, чтобы подать заявку на вклад.',
+              'error')
+        return redirect(url_for('deposit'))
+    elif (current_user.phone_number or current_user.first_name
+          or current_user.last_name or current_user.patronymic) == '':
+        flash('Не достаточно личных данных.',
+              'error')
+        return redirect(url_for('deposit'))
+
+    if form.validate_on_submit():
+        # print(date.today() + relativedelta(months=+form.term.data))
+        # print()
+        new_deposit = Deposit(
+            user_id=current_user.id,
+            amount=form.amount.data,
+            type_id=form.deposit_type.data,
+            start_date=date.today(),
+            end_date=date.today(),
+            is_closed=False
+        )
+
+        db.session.add(new_deposit)
+        db.session.commit()
+
+        new_deposit.end_date = date.today() + relativedelta(months=+new_deposit.type.term),
+        db.session.commit()
+
+        return redirect(url_for('deposit'))
+    else:
+        print(form.errors)
+
+    return render_template('new_deposit.html', form=form)
 
 
 def get_user_accounts(user):

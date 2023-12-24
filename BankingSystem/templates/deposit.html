@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Вклады{% endblock %}
+
+{% block content %}
+    <div class="container account__container">
+        <div class="account__content">
+            <div class="account__title">
+                <h1 class="account__rate-title"><b>Вклады</b></h1>
+            </div>
+
+            {% for msg in get_flashed_messages() %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+
+            {%  if deposits %}
+                <table class="account__table">
+                    <tr class="account__table-row">
+                        <th class="account__table-column_header">Сумма</th>
+{#                        <th class="account__table-column_header">Выплаченная сумма</th>#}
+                        <th class="account__table-column_header">Процентная ставка</th>
+                        <th class="account__table-column_header">Дата открытия</th>
+                        <th class="account__table-column_header">Дата закрытия</th>
+                        <th class="account__table-column_header">Статус</th>
+                    </tr>
+                    {% for deposit in deposits %}
+                    <tr class="account__table-row">
+                        <td class="account__table-column">{{ deposit.amount }}</td>
+{#                        <td class="account__table-column">{{ credit.repaid_amount }}</td>#}
+                        <td class="account__table-column">{{ deposit.type.interest_rate }}</td>
+                        <td class="account__table-column">{{ deposit.start_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="account__table-column">{{ deposit.end_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="account__table-column">Открыт</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="account__no-text">Кажется у вас нет вкладов.</p>
+            {% endif %}
+
+            <form action="/create_deposit" method="post">
+                <div class="form__container form__btn_container">
+                    <button class="btn account__btn">Создать новый</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
