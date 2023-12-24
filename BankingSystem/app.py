@@ -131,7 +131,6 @@ def get_user_accounts(user):
 
 @app.route('/bank_account', methods=['POST', 'GET'])
 @login_required
-# @role_required('Клиент')
 def bank_account():
     user_accounts = get_user_accounts(current_user)
     return render_template('bank_account.html', user_accounts=user_accounts)
@@ -282,22 +281,22 @@ def get_user_accounts(user):
     return user_accounts
 
 
-@app.route('/transaction', methods=['POST', 'GET'])
+@app.route('/transfer_transaction', methods=['POST', 'GET'])
 @login_required
-def transaction():
-    # radio_value = request.form.get('transaction')
-    # if radio_value == 'transaction__form1':
-    #     form = TransferTransactionForm()
-    #
-    #     user_accounts = get_user_accounts(current_user.id)
-    #     form.from_account.choices = [(acc.id, acc.name) for acc in user_accounts]
-    #
-    # elif radio_value == 'transaction__form2':
-    #     pass
-    # elif radio_value == 'transaction__form3':
-    #     pass
+def transfer_transaction():
+    return render_template('trans_transfer.html')
 
-    return render_template('transaction.html')
+
+@app.route('/currency_transaction', methods=['POST', 'GET'])
+@login_required
+def currency_transaction():
+    return render_template('trans_currency.html')
+
+
+@app.route('/payment_transaction', methods=['POST', 'GET'])
+@login_required
+def payment_transaction():
+    return render_template('trans_payments.html')
 
 
 @app.route('/profile', methods=['POST', 'GET'])

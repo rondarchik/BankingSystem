@@ -3,88 +3,31 @@
 {% block title %}Платежи{% endblock %}
 
 {% block content %}
-    <div class="container profile__container">
-        <div class="home__content">
+    <div class="container transaction__container">
+        <div class="sidebar">
+            <nav class="trans__nav-navigation">
+                <a href="/transfer_transaction" id="trans1" class="nav__link pb_nav__btn">
+                    Переводы между счетами
+                </a>
+                <a href="/payment_transaction" id="trans2" class="nav__link pb_nav__btn">
+                    Платежи
+                </a>
+                <a href="/currency_transaction" id="trans3" class="nav__link pb_nav__btn">
+                    Операции с валютой
+                </a>
+            </nav>
+        </div>
+
+        <div class="transaction__content">
             <div class="profile__title">
-                <h1 class="profile__rate-title"><b>Платежи и переводы</b></h1>
+                <h1 class="profile__rate-title"><b>{% block trans_title %}{% endblock %}</b></h1>
             </div>
 
-            <div class="form__radio">
-                <input type="radio" id="trans1" name="transaction" value="transaction__form1" checked>
-                <label for="trans1" class="form__radio-label">Перевод между счетами</label><br>
-                <input type="radio" id="trans2" name="transaction" value="transaction__form2">
-                <label for="trans2" class="form__radio-label">Платежи</label><br>
-                <input type="radio" id="trans3" name="transaction" value="transaction__form3">
-                <label for="trans3" class="form__radio-label">Операции с валютой</label><br>
-            </div>
-
-            <input type="hidden" name="form_radio" value="{{ }}">
-
-
-            <div id="transaction__form1">
-                <form method="POST" class="form__transaction">
-                    <div class="form__credit-group">
-                        <div class="form__credit-group-elem">
-                            <div class="form__container-credit form__input-container" id="currency" >
-                                <select class="profile-form__select" name="from_accounts">
-{#                                    {% for dept in form.department.choices %}#}
-{#                                        <option value="{{ dept[0] }}">{{ dept[1] }}</option>#}
-{#                                    {% endfor %}#}
-                                </select>
-                            </div>
-                            <div class="form__container-credit form__input-container">
-                                <input class="profile__form-input" type="email" name="to_accounts"
-{#                                       placeholder="{{ form.term.label.text }}"/>#}>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div id="transaction__form2">
-                <form method="POST" class="form__transaction">
-                    <div class="profile__form-group">
-                        <div class="form__group-elem">2
-                        </div>
-                        <div class="form__group-elem">2
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div id="transaction__form3">
-                <form method="POST" class="form__transaction">
-                   <div class="form__group-elem">3
-                        </div>
-                    <div class="form__group-elem">3
-                    </div>
-                </form>
-            </div>
+            {% block trans_form %}{% endblock %}
         </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        document.getElementById('trans1').addEventListener('change', function() {
-            document.getElementById('transaction__form1').style.display = this.checked ? 'block' : 'none';
-            document.getElementById('transaction__form2').style.display = this.checked ? 'none' : 'block';
-            document.getElementById('transaction__form3').style.display = this.checked ? 'none' : 'block';
-        });
-
-        document.getElementById('trans2').addEventListener('change', function() {
-            document.getElementById('transaction__form2').style.display = this.checked ? 'block' : 'none';
-            document.getElementById('transaction__form1').style.display = this.checked ? 'none' : 'block';
-            document.getElementById('transaction__form3').style.display = this.checked ? 'none' : 'block';
-        });
-
-        document.getElementById('trans3').addEventListener('change', function() {
-            document.getElementById('transaction__form3').style.display = this.checked ? 'block' : 'none';
-            document.getElementById('transaction__form2').style.display = this.checked ? 'none' : 'block';
-            document.getElementById('transaction__form1').style.display = this.checked ? 'none' : 'block';
-        });
-
-    </script>
 {% endblock %}
 

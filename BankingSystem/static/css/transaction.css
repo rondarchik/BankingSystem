@@ -1,18 +1,41 @@
-#transaction__form1 {
-    display: block;
-}
-
-#transaction__form2 {
-    display: none;
-}
-
-#transaction__form3 {
-    display: none;
-}
-
 .form__transaction {
     display: flex;
     widht: 100%;
     align-items: center;
     justify-content: center;
+}
+
+.transaction__container {
+    margin-top: 60px;
+    display: flex;
+}
+
+.transaction__content {
+    border-radius: 25px;
+    border: 1px solid #999999;
+    width: 800px;
+    display: block;
+    margin-left: 100px;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.sidebar {
+    margin-right: 50px;
+}
+
+.trans__nav-navigation {
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pb_nav__btn {
+    margin-bottom: 22px;
+}
+
+.pb_nav__btn:last-child {
+    margin-bottom: 0;
 }

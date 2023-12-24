@@ -31,7 +31,6 @@ class User(db.Model, UserMixin):
 class Client(db.Model):
     __tablename__ = 'Clients'
     id = db.Column(db.Integer, db.ForeignKey('Users.id'), primary_key=True)
-    # pref_currency_id = db.Column(db.Integer, db.ForeignKey('Currencies.id'), default=1)  # default = BYN (1)
     client_id = db.relationship('User', foreign_keys=[id])
 
 
@@ -142,12 +141,10 @@ class CreditRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     amount = db.Column(db.Float)
-    # interest_rate = db.Column(db.Float, default=0.1)
     department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'), nullable=False)
     status = db.Column(db.Boolean, default=False)
     request_date = db.Column(db.DateTime, default=datetime.now)
     type_id = db.Column(db.Integer, db.ForeignKey('CreditTypes.id'))
-    # date_term = db.Column(db.Integer)
 
     user = db.relationship('User', foreign_keys=[user_id])
     department = db.relationship('Department', foreign_keys=[department_id])
@@ -174,3 +171,16 @@ class Deposit(db.Model):
     start_date = db.Column(db.DateTime, default=datetime.now)
     end_date = db.Column(db.DateTime, default=datetime.now)
     is_closed = db.Column(db.Boolean, default=False)
+    type_id = db.Column(db.Integer, db.ForeignKey('DepositTypes.id'))
+
+    type = db.relationship('DepositType', foreign_keys=[type_id])
+
+
+class DepositType(db.Model):
+    __tablename__ = 'DepositTypes'
+    id = db.Column(db.Integer, primary_key=True)
+    type_name = db.Column(db.String(50), nullable=False)
+    min_amount = db.Column(db.Float, default=0.0)
+    max_amount = db.Column(db.Float, default=0.0)
+    interest_rate = db.Column(db.Float, default=0.0)
+    term = db.Column(db.Integer, default=0)
