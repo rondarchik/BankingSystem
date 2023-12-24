@@ -114,7 +114,7 @@ class CategoryType(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'Transactions'
     id = db.Column(db.Integer, primary_key=True)
-    from_account_id = db.Column(db.Integer, db.ForeignKey('BankAccounts.id'), nullable=False)
+    from_account_id = db.Column(db.Integer, db.ForeignKey('BankAccounts.id'))
     to_account_id = db.Column(db.Integer, db.ForeignKey('BankAccounts.id'))
     amount = db.Column(db.Float, default=0.0)
     transaction_date = db.Column(db.DateTime, default=datetime.now)

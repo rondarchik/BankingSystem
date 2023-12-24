@@ -1,0 +1,28 @@
+{% extends 'transaction.html' %}
+
+{% block trans_title %}Платежи{% endblock %}
+
+{% block trans_form %}
+<form method="POST" class="form-account">
+    {{ form.hidden_tag() }}
+
+    <div class="form__refill-group">
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="number" name="amount"
+                   placeholder="{{ form.amount.label.text }}">
+        </div>
+
+        <div class="form__container-acc form__input-container" id="to_account">
+            <select class="trans-form__select" name="to_account">
+                {% for account in form.to_account.choices %}
+                    <option value="{{ account[0] }}">{{ account[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form__container form__btn_container-acc">
+        <button class="btn account__btn">Подтвердить</button>
+    </div>
+</form>
+{% endblock %}

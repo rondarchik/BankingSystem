@@ -24,35 +24,6 @@ with app.app_context():
     db.create_all()
 
 
-@app.route('/')
-def home():
-    currencies = Currency.query.filter(Currency.currency_name != 'BYN').all()
-
-    date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
-    date_str = date.strftime("%d.%m.%Y %H:%M")
-
-    rates = []
-    for currency in currencies:
-        rates.append([
-            CurrencyRate.query.filter(
-                CurrencyRate.from_currency_id == Currency.query.filter_by(currency_name='BYN').first().id,
-                CurrencyRate.to_currency_id == Currency.query.filter_by(currency_name=currency.currency_name).first().id
-            ).all(),
-            CurrencyRate.query.filter(
-                CurrencyRate.from_currency_id == Currency.query.filter_by(
-                    currency_name=currency.currency_name).first().id,
-                CurrencyRate.to_currency_id == Currency.query.filter_by(currency_name='BYN').first().id
-            ).all()
-        ])
-
-    if current_user.is_authenticated:
-        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
-        if user_role == 'Админ':
-            return redirect(url_for('credit_admin'))
-
-    return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
-
-
 @login_manager.user_loader
 def load_user(user_id):  # ?????
     return User.query.get(int(user_id))
@@ -122,6 +93,119 @@ def register():
     else:
         print(form.errors)
     return render_template('register.html', form=form)
+
+
+@app.route('/profile', methods=['POST', 'GET'])
+@login_required
+def profile():
+    form = ProfileEditForm(request.form)
+    dept = None
+
+    if current_user.is_authenticated:
+        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+        user = User.query.filter_by(id=current_user.id).first()
+        if request.method == 'GET':
+            form.username.data = user.username
+            form.email.data = user.email
+            form.first_name.data = user.first_name
+            form.last_name.data = user.last_name
+            form.patronymic.data = user.patronymic
+            birth_date = datetime.strptime(str(user.birth_date), "%Y-%m-%d %H:%M:%S")
+            form.birth_date.data = birth_date.date()
+            form.phone_number.data = user.phone_number
+
+            if user_role == 'Админ':
+                admin = Admin.query.filter_by(id=current_user.id).first()
+                dept = (Department.query.with_entities(Department.id, Department.department_address)
+                        .filter(Department.id == admin.department_id).all())
+
+        if form.validate_on_submit():
+            # user.username = form.username.data  - я сделала так, что изменять нельзя, потому что кому нужны эти заморочки
+            user.email = form.email.data
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.patronymic = form.patronymic.data
+            user.birth_date = form.birth_date.data
+            user.phone_number = form.phone_number.data
+
+            if form.password.data != '':
+                user.set_password(form.password.data)
+
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            print(form.errors)
+
+        if user_role == 'Админ':
+            return render_template('profile_admin.html', form=form, user_role=user_role, dept=dept)
+
+    return render_template('profile.html', form=form, user_role=user_role, dept=dept)
+
+
+@app.route('/')
+def home():
+    currencies = Currency.query.filter(Currency.currency_name != 'BYN').all()
+
+    date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
+    date_str = date.strftime("%d.%m.%Y %H:%M")
+
+    rates = []
+    for currency in currencies:
+        rates.append([
+            CurrencyRate.query.filter(
+                CurrencyRate.from_currency_id == Currency.query.filter_by(currency_name='BYN').first().id,
+                CurrencyRate.to_currency_id == Currency.query.filter_by(currency_name=currency.currency_name).first().id
+            ).all(),
+            CurrencyRate.query.filter(
+                CurrencyRate.from_currency_id == Currency.query.filter_by(
+                    currency_name=currency.currency_name).first().id,
+                CurrencyRate.to_currency_id == Currency.query.filter_by(currency_name='BYN').first().id
+            ).all()
+        ])
+
+    if current_user.is_authenticated:
+        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
+        if user_role == 'Админ':
+            return redirect(url_for('credit_admin'))
+
+    return render_template('home.html', currencies=currencies, rates=rates, date=date_str)
+
+
+@app.route('/convert', methods=['POST'])
+def convert():
+    data = request.get_json()
+    currency1 = data['currency1']
+    input_currency1 = data['input_currency1']
+    currency2 = data['currency2']
+    input_currency2 = data['input_currency2']
+
+    if input_currency1:
+        amount = float(input_currency1)
+        from_currency = currency1
+        to_currency = currency2
+        rate = get_rates(to_currency, from_currency)
+        converted_amount = float(amount) / rate
+    elif input_currency2:
+        amount = float(input_currency2)
+        from_currency = currency2
+        to_currency = currency1
+        rate = get_rates(to_currency, from_currency)
+        converted_amount = float(amount) * rate
+    else:
+        return jsonify(error='Введите сумму для конвертации')
+
+    return jsonify(converted_amount=converted_amount)
+
+
+def get_rates(to_currency, from_currency):
+    latest_date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
+    latest_rates = (CurrencyRate.query.filter_by(
+        date=latest_date,
+        to_currency_id=Currency.query.filter_by(currency_name=to_currency).first().id,
+        from_currency_id=Currency.query.filter_by(currency_name=from_currency).first().id)
+                    .first())
+
+    return latest_rates.rate
 
 
 def get_user_accounts(user):
@@ -381,7 +465,7 @@ def create_deposit():
 
 
 def get_user_accounts(user):
-    user_accounts = BankAccount.query.filter_by(user=user).all()
+    user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
     return user_accounts
 
 
@@ -397,94 +481,42 @@ def currency_transaction():
     return render_template('trans_currency.html')
 
 
-@app.route('/payment_transaction', methods=['POST', 'GET'])
+def get_payment_categories():
+    selected_category_ids = [2, 3, 6]
+    selected_categories = Category.query.filter(Category.id.in_(selected_category_ids)).all()
+
+    return selected_categories
+
+
+@app.route('/refill_transaction', methods=['POST', 'GET'])
 @login_required
-def payment_transaction():
-    return render_template('trans_payments.html')
+def refill_transaction():
+    form = RefillTransactionForm()
 
+    accounts = get_user_accounts(current_user)
+    form.to_account.choices = [(account.id, account.account_name) for account in accounts]
 
-@app.route('/profile', methods=['POST', 'GET'])
-@login_required
-def profile():
-    form = ProfileEditForm(request.form)
-    dept = None
+    if form.validate_on_submit():
+        category_id = Category.query.filter_by(category_name='Пополнение счета').first().id
+        to_account_id = int(request.form['to_account'])
+        account = BankAccount.query.get(to_account_id)
 
-    if current_user.is_authenticated:
-        user_role = UserRole.query.filter_by(user_id=current_user.id).first().role.role_name
-        user = User.query.filter_by(id=current_user.id).first()
-        if request.method == 'GET':
-            form.username.data = user.username
-            form.email.data = user.email
-            form.first_name.data = user.first_name
-            form.last_name.data = user.last_name
-            form.patronymic.data = user.patronymic
-            birth_date = datetime.strptime(str(user.birth_date), "%Y-%m-%d %H:%M:%S")
-            form.birth_date.data = birth_date.date()
-            form.phone_number.data = user.phone_number
+        new_transaction = Transaction(
+            to_account_id=to_account_id,
+            amount=form.amount.data,
+            transaction_date=date.today(),
+            category_id=category_id,
+            status=True,
+        )
 
-            if user_role == 'Админ':
-                admin = Admin.query.filter_by(id=current_user.id).first()
-                dept = (Department.query.with_entities(Department.id, Department.department_address)
-                        .filter(Department.id == admin.department_id).all())
+        account.balance += new_transaction.amount
 
-        if form.validate_on_submit():
-            # user.username = form.username.data  - я сделала так, что изменять нельзя, потому что кому нужны эти заморочки
-            user.email = form.email.data
-            user.first_name = form.first_name.data
-            user.last_name = form.last_name.data
-            user.patronymic = form.patronymic.data
-            user.birth_date = form.birth_date.data
-            user.phone_number = form.phone_number.data
-
-            if form.password.data != '':
-                user.set_password(form.password.data)
-
-            db.session.commit()
-            return redirect(url_for('home'))
-        else:
-            print(form.errors)
-
-        if user_role == 'Админ':
-            return render_template('profile_admin.html', form=form, user_role=user_role, dept=dept)
-
-    return render_template('profile.html', form=form, user_role=user_role, dept=dept)
-
-
-@app.route('/convert', methods=['POST'])
-def convert():
-    data = request.get_json()
-    currency1 = data['currency1']
-    input_currency1 = data['input_currency1']
-    currency2 = data['currency2']
-    input_currency2 = data['input_currency2']
-
-    if input_currency1:
-        amount = float(input_currency1)
-        from_currency = currency1
-        to_currency = currency2
-        rate = get_rates(to_currency, from_currency)
-        converted_amount = float(amount) / rate
-    elif input_currency2:
-        amount = float(input_currency2)
-        from_currency = currency2
-        to_currency = currency1
-        rate = get_rates(to_currency, from_currency)
-        converted_amount = float(amount) * rate
+        db.session.add(new_transaction)
+        db.session.commit()
     else:
-        return jsonify(error='Введите сумму для конвертации')
+        print(form.errors)
 
-    return jsonify(converted_amount=converted_amount)
-
-
-def get_rates(to_currency, from_currency):
-    latest_date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
-    latest_rates = (CurrencyRate.query.filter_by(
-        date=latest_date,
-        to_currency_id=Currency.query.filter_by(currency_name=to_currency).first().id,
-        from_currency_id=Currency.query.filter_by(currency_name=from_currency).first().id)
-                    .first())
-
-    return latest_rates.rate
+    return render_template('trans_refill.html', form=form)
 
 
 if __name__ == '__main__':

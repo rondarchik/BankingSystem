@@ -79,3 +79,10 @@ class ApproveRequestForm(FlaskForm):
 #     category = SelectField('Категория перевода', choices=[], validators=[DataRequired()])
 #
 #     submit = SubmitField('Перевести')
+
+
+class RefillTransactionForm(FlaskForm):
+    to_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
+    amount = FloatField('Сумма', default=0.0)
+
+    submit = SubmitField('Подтвердить')
