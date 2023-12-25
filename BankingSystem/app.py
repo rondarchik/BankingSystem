@@ -180,14 +180,20 @@ def convert():
         amount = float(input_currency1)
         from_currency = currency1
         to_currency = currency2
-        rate = get_rates(to_currency, from_currency)
-        converted_amount = float(amount) / rate
+        if from_currency == to_currency:
+            converted_amount = float(amount) / 1
+        else:
+            rate = get_rates(to_currency, from_currency)
+            converted_amount = float(amount) / rate
     elif input_currency2:
         amount = float(input_currency2)
         from_currency = currency2
         to_currency = currency1
-        rate = get_rates(to_currency, from_currency)
-        converted_amount = float(amount) * rate
+        if from_currency == to_currency:
+            converted_amount = float(amount) * 1
+        else:
+            rate = get_rates(to_currency, from_currency)
+            converted_amount = float(amount) * rate
     else:
         return jsonify(error='Введите сумму для конвертации')
 
@@ -197,7 +203,7 @@ def convert():
 @app.route('/bank_account', methods=['POST', 'GET'])
 @login_required
 def bank_account():
-    user_accounts = get_user_accounts(current_user)
+    user_accounts = get_all_user_accounts(current_user)
     return render_template('bank_account.html', user_accounts=user_accounts)
 
 
@@ -437,10 +443,82 @@ def transfer_transaction():
     return render_template('trans_transfer.html')
 
 
+@app.route('/get_user_accounts_by_currency/<int:currency_id>', methods=['GET'])
+def get_user_accounts_by_currency(currency_id):
+    user_accounts = BankAccount.query.filter_by(user_id=current_user.id, currency_id=currency_id).all()
+    accounts_data = [(acc.id, acc.account_name) for acc in user_accounts]
+    return jsonify(accounts_data)
+
+
+@app.route('/get_currency_rate/<int:from_currency_id>/<int:to_currency_id>', methods=['GET'])
+def get_currency_rate(from_currency_id, to_currency_id):
+    rate = get_currency_rate_from_database(from_currency_id, to_currency_id)
+    return jsonify({'rate': rate})
+
+
 @app.route('/currency_transaction', methods=['POST', 'GET'])
 @login_required
 def currency_transaction():
-    return render_template('trans_currency.html')
+    form = CurrencyOperationTransactionForm()
+
+    currencies = Currency.query.all()
+    form.from_currency.choices = [(curr.id, curr.currency_name) for curr in currencies]
+    form.to_currency.choices = [(curr.id, curr.currency_name) for curr in currencies]
+
+    if 'from_currency' in request.form:
+        from_currency_id = int(request.form['from_currency'])
+        from_accounts = BankAccount.query.filter_by(user_id=current_user.id, currency_id=from_currency_id).all()
+        form.from_account.choices = [(acc.id, acc.account_name) for acc in from_accounts]
+
+    if 'to_currency' in request.form:
+        to_currency_id = int(request.form['to_currency'])
+        to_accounts = BankAccount.query.filter_by(user_id=current_user.id, currency_id=to_currency_id).all()
+        form.to_account.choices = [(acc.id, acc.account_name) for acc in to_accounts]
+
+    if form.validate_on_submit():
+        from_account_id = int(request.form['from_account'])
+        from_account = BankAccount.query.get(from_account_id)
+        to_account_id = int(request.form['to_account'])
+        to_account = BankAccount.query.get(to_account_id)
+        category1 = Category.query.filter_by(category_name='Покупка валюты').first().id
+        category2 = Category.query.filter_by(category_name='Продажа валюты').first().id
+        category3 = Category.query.filter_by(category_name='Пополнение счета').first().id
+
+        if from_account and from_account.balance >= form.amount.data:
+            if Currency.query.filter_by(id=int(request.form['from_currency'])).first().currency_name == 'BYN':
+                category = category1
+            else:
+                category = category2
+            new_transaction1 = Transaction(
+                from_account_id=from_account_id,
+                amount=form.amount.data,
+                transaction_date=date.today(),
+                category_id=category,
+                status=True,
+            )
+
+            from_account.balance -= new_transaction1.amount
+
+            new_transaction2 = Transaction(
+                to_account_id=to_account_id,
+                amount=form.res_amount.data,
+                transaction_date=date.today(),
+                category_id=category3,
+                status=True,
+            )
+
+            to_account.balance += new_transaction2.amount
+
+            db.session.add(new_transaction1)
+            db.session.add(new_transaction2)
+            db.session.commit()
+        else:
+            flash('Недостаточно средств.',
+                  'error')
+    else:
+        print(form.errors)
+
+    return render_template('trans_currency.html', form=form)
 
 
 @app.route('/refill_transaction', methods=['POST', 'GET'])
@@ -448,7 +526,7 @@ def currency_transaction():
 def refill_transaction():
     form = RefillTransactionForm()
 
-    accounts = get_user_accounts(current_user)
+    accounts = get_all_user_accounts(current_user)
     form.to_account.choices = [(account.id, account.account_name) for account in accounts]
 
     if form.validate_on_submit():

@@ -19,7 +19,7 @@
                     {% for account in user_accounts %}
                         <tr class="account__table-row">
                             <td class="account__table-column">{{ account.account_name }}</td>
-                            <td class="account__table-column">{{ account.balance }}</td>
+                            <td class="account__table-column">{{ account.balance | round(2) }}</td>
                             <td class="account__table-column">{{ account.currency.currency_name }}</td>
                         </tr>
                     {% endfor %}

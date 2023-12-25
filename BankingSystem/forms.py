@@ -96,6 +96,17 @@ class CreditTransactionForm(FlaskForm):
     submit = SubmitField('Подтвердить')
 
 
+class CurrencyOperationTransactionForm(FlaskForm):
+    from_account = SelectField('Исходный счет', choices=[], validators=[DataRequired()])
+    amount = FloatField('Сумма', default=0.0)
+    from_currency = SelectField('Исходная валюта', choices=[], validators=[DataRequired()])
+    to_account = SelectField('Счет', choices=[], validators=[DataRequired()])
+    res_amount = FloatField('Итоговая сумма', default=0.0)
+    to_currency = SelectField('Валюта', choices=[], validators=[DataRequired()])
+
+    submit = SubmitField('Подтвердить')
+
+
 class DepositTransactionForm(FlaskForm):
     from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
     amount = FloatField('Сумма', default=0.0)

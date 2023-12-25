@@ -3,5 +3,118 @@
 {% block trans_title %}Операции с валютой{% endblock %}
 
 {% block trans_form %}
+{% for msg in get_flashed_messages() %}
+    <div class="flash">{{ msg }}</div>
+{% endfor %}
 
+<form method="POST" class="form-trans">
+    {{ form.hidden_tag() }}
+
+    <div class="form__refill-group">
+        <div class="form__container-acc form__input-container" id="from_account">
+            <select class="trans-form__select" name="from_account">
+             </select>
+        </div>
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="text" name="amount"
+                   placeholder="{{ form.amount.label.text }}">
+        </div>
+        <div class="form__container-acc form__input-container" id="from_currency" >
+            <select class="trans-form__select" name="from_currency">
+                {% for curr in form.from_currency.choices %}
+                    <option value="{{ curr[0] }}">{{ curr[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form__refill-group">
+        <div class="form__container-acc form__input-container" id="to_account">
+            <select class="trans-form__select" name="to_account">
+             </select>
+        </div>
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="text" name="res_amount"
+                   placeholder="{{ form.res_amount.label.text }}" readonly>
+        </div>
+        <div class="form__container-acc form__input-container" id="to_currency" >
+            <select class="trans-form__select" name="to_currency">
+                {% for curr in form.to_currency.choices %}
+                    <option value="{{ curr[0] }}">{{ curr[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form__container form__btn_container-acc">
+        <button class="btn account__btn">Подтвердить</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('input[name="amount"]').change(function() {
+            var fromCurrency = $('select[name="from_currency"]').val();
+            var toCurrency = $('select[name="to_currency"]').val();
+
+            $.ajax({
+                url: '/get_currency_rate/' + fromCurrency + '/' + toCurrency,
+                type: 'GET',
+                success: function(data) {
+                    updateResAmount(data.rate, fromCurrency, toCurrency);
+                }
+            });
+        });
+
+        function updateResAmount(rate, fromCurrency, toCurrency, callback) {
+            var amount = parseFloat($('input[name="amount"]').val());
+            var resAmount;
+
+            if (fromCurrency === "1") {
+                resAmount = amount / rate;
+            } else {
+                resAmount = amount * rate;
+            }
+            $('input[name="res_amount"]').val(resAmount.toFixed(2));
+        }
+
+        // При изменении валюты отправляем запрос на сервер для получения счетов пользователя
+        $('#from_currency select').change(function() {
+            var selectedCurrency = $(this).val();
+
+            $.ajax({
+                url: '/get_user_accounts_by_currency/' + selectedCurrency,
+                type: 'GET',
+                success: function(data) {
+                    updateAccountOptions('#from_account select', data);
+                }
+            });
+        });
+
+        $('#to_currency select').change(function() {
+            var selectedCurrency = $(this).val();
+
+            $.ajax({
+                url: '/get_user_accounts_by_currency/' + selectedCurrency,
+                type: 'GET',
+                success: function(data) {
+                    updateAccountOptions('#to_account select', data);
+                }
+            });
+        });
+
+        function updateAccountOptions(selectId, data) {
+            $(selectId).empty();
+
+            for (var i = 0; i < data.length; i++) {
+                $(selectId).append('<option value="' + data[i][0] + '">' + data[i][1] + '</option>');
+            }
+        }
+
+    });
+</script>
 {% endblock %}

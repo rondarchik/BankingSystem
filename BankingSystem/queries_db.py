@@ -55,7 +55,7 @@ def get_category_for_deposit_trans():
     return category_id
 
 
-def get_user_accounts(user):
+def get_all_user_accounts(user):
     user_accounts = BankAccount.query.filter_by(user_id=user.id).all()
     return user_accounts
 
@@ -72,20 +72,16 @@ def get_user_byn_accounts(user):
     return user_accounts
 
 
+def get_user_currency_accounts(user, currency):
+    user_accounts = BankAccount.query.filter_by(user_id=user.id,
+                                                currency_id=currency,
+                                                ).all()
+    return user_accounts
+
+
 def get_user_deposits(user):
     user_deposits = Deposit.query.filter_by(user_id=user.id, is_closed=False).all()
     return user_deposits
-
-
-# def get_user_transactions(user):
-#     user_transactions = (
-#         Transaction.query
-#         .join(BankAccount,
-#               (BankAccount.id == Transaction.from_account_id) | (BankAccount.id == Transaction.to_account_id))
-#         .filter(BankAccount.user_id == user.id)
-#         .all()
-#     )
-#     return user_transactions
 
 
 def get_user_transactions(user, date_filter=None, period_start=None, period_end=None):
@@ -103,3 +99,15 @@ def get_user_transactions(user, date_filter=None, period_start=None, period_end=
     user_transactions = query.all()
 
     return user_transactions
+
+
+def get_currency_rate_from_database(from_currency_id, to_currency_id):
+    currency_rate = CurrencyRate.query.filter_by(
+        from_currency_id=from_currency_id,
+        to_currency_id=to_currency_id
+    ).first()
+
+    if currency_rate:
+        return currency_rate.rate
+    else:
+        return 1.0

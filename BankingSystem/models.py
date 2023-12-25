@@ -80,7 +80,6 @@ class CurrencyRate(db.Model):
     from_currency_id = db.Column(db.Integer, db.ForeignKey('Currencies.id'), nullable=False)
     to_currency_id = db.Column(db.Integer, db.ForeignKey('Currencies.id'), nullable=False)
     rate = db.Column(db.Float, nullable=False)
-    scale = db.Column(db.Integer, default=0)
     date = db.Column(db.DateTime, nullable=False)
 
     from_currency = db.relationship('Currency', foreign_keys=[from_currency_id])

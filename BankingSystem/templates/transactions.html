@@ -33,7 +33,7 @@
                         <tr class="account__table-row">
                             <td class="account__table-column">{{ trans.from_account.account_name or '' }}</td>
                             <td class="account__table-column">{{ trans.to_account.account_name or '' }}</td>
-                            <td class="account__table-column">{{ trans.amount }}</td>
+                            <td class="account__table-column">{{ trans.amount | round(2) }}</td>
                             <td class="account__table-column">{{ trans.transaction_date.strftime('%Y-%m-%d') }}</td>
                             <td class="account__table-column">{{ trans.category.category_name }}</td>
                         </tr>

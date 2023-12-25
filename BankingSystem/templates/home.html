@@ -19,13 +19,13 @@
                             <div class="home__group-elem">
                                 <p class="home__elem-text">Покупка</p>
                                 <p class="home__elem-text">
-                                    {{ rates[i][0][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1) }}
+                                    {{ (rates[i][0][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1)) | round(2) }}
                                 </p>
                             </div>
                             <div class="home__group-elem">
                                 <p class="home__elem-text">Продажа</p>
                                 <p class="home__elem-text">
-                                    {{ rates[i][1][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1) }}
+                                    {{ (rates[i][1][0].rate * (100 if currencies[i].currency_name == 'RUB' else 1)) | round(2) }}
                                 </p>
                             </div>
                         </div>

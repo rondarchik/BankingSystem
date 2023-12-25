@@ -26,7 +26,7 @@
                     {% for deposit in deposits %}
                     <tr class="account__table-row">
                         <td class="account__table-column">{{ deposit.type.type_name }}</td>
-                        <td class="account__table-column">{{ deposit.amount }}</td>
+                        <td class="account__table-column">{{ deposit.amount | round(2) }}</td>
                         <td class="account__table-column">{{ deposit.type.interest_rate }}</td>
                         <td class="account__table-column">{{ deposit.start_date.strftime('%Y-%m-%d') }}</td>
                         <td class="account__table-column">{{ deposit.end_date.strftime('%Y-%m-%d') }}</td>
