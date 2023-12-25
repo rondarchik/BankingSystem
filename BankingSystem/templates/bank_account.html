@@ -5,6 +5,42 @@
 {% block content %}
     <div class="container account__container">
         <div class="account__content">
+            <div class="transfer_request">
+                {% if transfers and transfers.status == False %}
+                    <div class="account__title">
+                        <h1 class="account__rate-title"><b>Запросы на переводы</b></h1>
+                    </div>
+                    <table class="account__table">
+                        <tr class="account__table-row">
+                            <th class="account__table-column_header">Отправитель</th>
+                            <th class="account__table-column_header">Сумма</th>
+                            <th class="account__table-column_header">Счет для зачисления</th>
+                            <th class="account__table-column_header">Статус</th>
+                        </tr>
+                        {% for transfer in transfers %}
+                            <tr class="account__table-row">
+                                <td class="account__table-column">{{ transfer.from_account.user.email }}</td>
+                                <td class="account__table-column">{{ transfer.amount | round(2) }}</td>
+                                <form method="POST" action="/approve_transfer/{{ transfer.id }}">
+                                    <td class="account__table-column">
+                                        <input type="hidden" name="transfer_id" value="{{ transfer.id }}">
+                                        <select class="transfer-form__select" name="to_account">
+                                            {% for account in user_accounts %}
+                                                <option value="{{ account.id }}">{{ account.account_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="account__table-column">
+                                            <button class="btn transfer__btn" type="submit">Ok</button>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+
+            </div>
+
             <div class="account__title">
                 <h1 class="account__rate-title"><b>Счета</b></h1>
             </div>
@@ -33,10 +69,6 @@
                     <button class="btn account__btn">Создать новый</button>
                 </div>
             </form>
-
-{#            <div class="form__container form__btn_container">#}
-{#                <button class="btn account__btn">Создать новый</button>#}
-{#            </div>#}
         </div>
     </div>
 {% endblock %}

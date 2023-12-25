@@ -111,3 +111,16 @@ def get_currency_rate_from_database(from_currency_id, to_currency_id):
         return currency_rate.rate
     else:
         return 1.0
+
+
+def user_exists(email):
+    user = User.query.filter_by(email=email).first()
+    return user is not None
+
+
+def get_transfer_requests_by_user_email(email):
+    return TransferRequest.query.filter_by(to_user=email).all()
+
+
+def get_account_by_user_email(user):
+    return BankAccount.equest.query.filter_by(user_id=user.id).all()

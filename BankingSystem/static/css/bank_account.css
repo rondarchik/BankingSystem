@@ -1,8 +1,30 @@
 .account__container {
     margin-top: 60px;
+    margin-bottom: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.transfer_request {
+    margin-bottom: 30px;
+}
+
+.transfer-form__select {
+    font-size: 15px;
+    width: 80%;
+    background: #ffffff;
+    color: #000000;
+    height: 30px;
+    border-radius: 25px;
+    border: 1px solid #000000;
+    padding: 0 15px 0 15px;
+}
+
+.transfer__btn {
+    width: 50%;
+    height: 30px;
+    font-size: 18px;
 }
 
 .account__content {

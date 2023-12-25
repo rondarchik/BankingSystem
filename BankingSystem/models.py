@@ -189,3 +189,16 @@ class DepositType(db.Model):
     min_amount = db.Column(db.Float, default=0.0)
     interest_rate = db.Column(db.Float, default=0.0)
     term = db.Column(db.Integer, default=0)
+
+
+class TransferRequest(db.Model):
+    __tablename__ = 'TransferRequests'
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float, default=0.0)
+    from_account_id = db.Column(db.Integer, db.ForeignKey('BankAccounts.id'))
+    to_user = db.Column(db.String(50), nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('Transactions.id'))
+    status = db.Column(db.Boolean, default=False)
+
+    from_account = db.relationship('BankAccount', foreign_keys=[from_account_id])
+    transaction = db.relationship('Transaction', foreign_keys=[transaction_id])

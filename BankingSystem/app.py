@@ -200,11 +200,42 @@ def convert():
     return jsonify(converted_amount=converted_amount)
 
 
+@app.route('/approve_transfer/<int:transfer_id>', methods=['POST'])
+def approve_transfer(transfer_id):
+    transfer_request = TransferRequest.query.get_or_404(transfer_id)
+
+    transfer_request.status = True
+    transfer_request.transaction.status = True
+    transfer_request.from_account.balance -= transfer_request.amount
+
+    category = Category.query.filter_by(category_name='Пополнение счета').first().id
+
+    to_account_id = int(request.form.get('to_account'))
+    to_account = BankAccount.query.get(to_account_id)
+
+    new_transaction = Transaction(
+        to_account_id=to_account_id,
+        amount=transfer_request.amount,
+        transaction_date=date.today(),
+        category_id=category,
+        status=True,
+    )
+
+    to_account.balance += transfer_request.amount
+
+    db.session.add(new_transaction)
+    db.session.commit()
+
+    return redirect(url_for('bank_account'))
+
+
 @app.route('/bank_account', methods=['POST', 'GET'])
 @login_required
 def bank_account():
     user_accounts = get_all_user_accounts(current_user)
-    return render_template('bank_account.html', user_accounts=user_accounts)
+    transfers = get_transfer_requests_by_user_email(current_user.email)
+
+    return render_template('bank_account.html', user_accounts=user_accounts, transfers=transfers)
 
 
 @app.route('/create_account', methods=['POST', 'GET'])
@@ -440,7 +471,45 @@ def transactions():
 @app.route('/transfer_transaction', methods=['POST', 'GET'])
 @login_required
 def transfer_transaction():
-    return render_template('trans_transfer.html')
+    form = TransferTransactionForm()
+
+    accounts = get_all_user_accounts(current_user)
+    form.from_account.choices = [(account.id, account.account_name) for account in accounts]
+
+    if form.validate_on_submit():
+        category_id = Category.query.filter_by(category_name='Перевод на счет').first().id
+        from_account_id = int(request.form['from_account'])
+        to_account_email = form.to_account.data
+
+        if not user_exists(to_account_email):
+            flash('Пользователь с указанной почтой не найден.', 'error')
+            return redirect(url_for('transfer_transaction'))
+
+        new_transaction = Transaction(
+            from_account_id=from_account_id,
+            amount=form.amount.data,
+            transaction_date=date.today(),
+            category_id=category_id,
+            status=False
+        )
+
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        transfer = TransferRequest(
+            from_account_id=from_account_id,
+            amount=new_transaction.amount,
+            to_user=to_account_email,
+            transaction_id=new_transaction.id,
+            status=False
+        )
+
+        db.session.add(transfer)
+        db.session.commit()
+    else:
+        print(form.errors)
+
+    return render_template('trans_transfer.html', form=form)
 
 
 @app.route('/get_user_accounts_by_currency/<int:currency_id>', methods=['GET'])

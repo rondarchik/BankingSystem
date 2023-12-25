@@ -71,14 +71,13 @@ class ApproveRequestForm(FlaskForm):
     submit = SubmitField('Ok')
 
 
-# class TransferTransactionForm(FlaskForm):
-#     from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
-#     to_account = StringField('Электронная почта получателя','Электронная почта',
-#                              validators=[Email(), DataRequired()])
-#     amount = FloatField('Сумма', default=0.0)
-#     category = SelectField('Категория перевода', choices=[], validators=[DataRequired()])
-#
-#     submit = SubmitField('Перевести')
+class TransferTransactionForm(FlaskForm):
+    from_account = SelectField('Счет пользователя', choices=[], validators=[DataRequired()])
+    to_account = StringField('Электронная почта получателя',
+                             validators=[Email(), DataRequired()])
+    amount = FloatField('Сумма', default=0.0)
+
+    submit = SubmitField('Перевести')
 
 
 class RefillTransactionForm(FlaskForm):

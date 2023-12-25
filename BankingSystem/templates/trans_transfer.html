@@ -3,5 +3,33 @@
 {% block trans_title %}Переводы между счетами{% endblock %}
 
 {% block trans_form %}
+{% for msg in get_flashed_messages() %}
+    <div class="flash">{{ msg }}</div>
+{% endfor %}
 
+<form method="POST" class="form-trans">
+    {{ form.hidden_tag() }}
+
+    <div class="form__refill-group">
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="number" name="amount"
+                   placeholder="{{ form.amount.label.text }}">
+        </div>
+        <div class="form__container-acc form__input-container" id="from_account">
+            <select class="trans-form__select" name="from_account">
+                {% for acc in form.from_account.choices %}
+                    <option value="{{ acc[0] }}">{{ acc[1] }}</option>
+                {% endfor %}
+             </select>
+        </div>
+        <div class="form__container-acc form__input-container">
+            <input class="trans__form-input" type="text" name="to_account"
+                   placeholder="{{ form.to_account.label.text }}">
+        </div>
+    </div>
+
+    <div class="form__container form__btn_container-acc">
+        <button class="btn account__btn">Подтвердить</button>
+    </div>
+</form>
 {% endblock %}
