@@ -44,7 +44,8 @@
                                 <option value="{{ currency.currency_name }}">{{ currency.currency_name }}</option>
                             {% endfor %}
                         </select>
-                        <input class="home__input" type="number" name="input_currency1"
+                        <input class="home__input" type="text" name="input_currency1"
+                               pattern="[0-9]+(\.[0-9]+)?"
                            placeholder="BYN" value="{{ '' }}">
                     </div>
                     <div class="home__form-elem elem2">
@@ -54,9 +55,10 @@
                                 <option value="{{ currency.currency_name }}">{{ currency.currency_name }}</option>
                             {% endfor %}
                         </select>
-                        <input class="home__input" type="number" name="input_currency2"
-                           placeholder="BYN"
-                           value="{{ '' }}">
+                        <input class="home__input" type="text" name="input_currency2"
+                               pattern="[0-9]+(\.[0-9]+)?"
+                               placeholder="BYN"
+                               value="{{ '' }}">
                     </div>
                 </div>
                 <input type="hidden" name="currency" value="{{ '' }}">
@@ -102,48 +104,12 @@
                 .then(response => response.json())
                 .then(data => {
                     if (input_currency1) {
-                        form.elements['input_currency2'].value = data.converted_amount;
+                        form.elements['input_currency2'].value = data.converted_amount.toFixed(2);
                     } else if (input_currency2) {
-                        form.elements['input_currency1'].value = data.converted_amount;
+                        form.elements['input_currency1'].value = data.converted_amount.toFixed(2);
                     }
                 });
             });
         }
     </script>
-
-{#    <script>#}
-{#        window.onload = function() {#}
-{#            var form = document.querySelector('.home__group-form');#}
-{#            form.addEventListener('submit', function(event) {#}
-{#                event.preventDefault();#}
-{##}
-{#                var currency1 = form.elements['currency1'].value;#}
-{#                var input_currency1 = form.elements['input_currency1'].value;#}
-{#                var currency2 = form.elements['currency2'].value;#}
-{#                var input_currency2 = form.elements['input_currency2'].value;#}
-{##}
-{#                fetch('/convert', {#}
-{#                    method: 'POST',#}
-{#                    headers: {#}
-{#                        'Content-Type': 'application/json',#}
-{#                    },#}
-{#                    body: JSON.stringify({#}
-{#                        currency1: currency1,#}
-{#                        input_currency1: input_currency1,#}
-{#                        currency2: currency2,#}
-{#                        input_currency2: input_currency2,#}
-{#                    }),#}
-{#                })#}
-{#                .then(response => response.json())#}
-{#                .then(data => {#}
-{#                    if (input_currency1) {#}
-{#                        form.elements['input_currency2'].value = data.converted_amount;#}
-{#                    } else if (input_currency2) {#}
-{#                        form.elements['input_currency1'].value = data.converted_amount;#}
-{#                    }#}
-{#                });#}
-{#            });#}
-{#        }#}
-{#    </script>#}
-
 {% endblock %}

@@ -17,7 +17,8 @@
         </div>
         <div class="form__container-acc form__input-container">
             <input class="trans__form-input" type="text" name="amount"
-                   placeholder="{{ form.amount.label.text }}">
+                   placeholder="{{ form.amount.label.text }}"
+                   pattern="[0-9]+(\.[0-9]+)?">
         </div>
         <div class="form__container-acc form__input-container" id="from_currency" >
             <select class="trans-form__select" name="from_currency">

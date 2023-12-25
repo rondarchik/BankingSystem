@@ -19,8 +19,9 @@
                     </div>
 
                     <div class="form__container-acc form__input-container">
-                        <input class="account__form-input" type="number" name="balance"
-                               placeholder="{{ form.balance.label.text }}">
+                        <input class="account__form-input" type="text" name="balance"
+                               placeholder="{{ form.balance.label.text }}"
+                               pattern="[0-9]+(\.[0-9]+)?">
                     </div>
 
                     <div class="form__container-acc form__input-container" id="currency" >

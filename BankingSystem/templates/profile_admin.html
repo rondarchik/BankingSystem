@@ -18,30 +18,45 @@
                             <input class="profile__form-input" type="text" name="username"
                                    value="{{ form.username.data or '' }}"
                                    placeholder="{{ form.username.label.text}}" readonly>
+                            {% if form.username.errors %}
+                                <p class="form__error">{{ form.username.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container">
                             <input class="profile__form-input" type="text" name="email"
                                    value="{{ form.email.data or '' }}"
                                    placeholder="{{ form.email.label.text}}">
+                            {% if form.email.errors %}
+                                <p class="form__error">{{ form.email.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container">
                             <input class="profile__form-input" type="text" name="first_name"
                                    value="{{ form.first_name.data or '' }}"
                                    placeholder="{{ form.first_name.label.text }}">
+                            {% if form.first_name.errors %}
+                                <p class="form__error">{{ form.first_name.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container">
                             <input class="profile__form-input" type="text" name="last_name"
                                    value="{{ form.last_name.data or '' }}"
                                    placeholder="{{ form.last_name.label.text }}">
+                            {% if form.last_name.errors %}
+                                <p class="form__error">{{ form.last_name.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container">
                             <input class="profile__form-input" type="text" name="patronymic"
                                    value="{{ form.patronymic.data or '' }}"
                                    placeholder="{{ form.patronymic.label.text }}">
+                            {% if form.patronymic.errors %}
+                                <p class="form__error">{{ form.patronymic.errors[0] }}</p>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form__group-elem">
@@ -49,22 +64,34 @@
                             <input class="profile-form__input-date" type="date" name="birth_date" id="dateField"
                                    value="{{ form.birth_date.data }}"
                                    placeholder="{{ form.birth_date.label.text }}">
+                            {% if form.birth_date.errors %}
+                                <p class="form__error">{{ form.birth_date.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container">
                             <input class="profile__form-input" type="text" name="phone_number" id="phone_number"
                                    value="{{ form.phone_number.data or '' }}"
                                    placeholder="{{ form.phone_number.label.text }}">
+                            {% if form.phone_number.errors %}
+                                <p class="form__error">{{ form.phone_number.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container" >
                             <input class="profile__form-input" type="password" name="password"
                                    placeholder="{{ form.password.label.text }}">
+                            {% if form.password.errors %}
+                                <p class="form__error">{{ form.password.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         <div class="form__container form__input-container" >
                             <input class="profile__form-input" type="password" name="confirm_password"
                                    placeholder="{{ form.confirm_password.label.text }}">
+                            {% if form.confirm_password.errors %}
+                                <p class="form__error">{{ form.confirm_password.errors[0] }}</p>
+                            {% endif %}
                         </div>
 
                         {% if current_user.is_authenticated and user_role == 'Админ' %}
