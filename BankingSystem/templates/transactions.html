@@ -5,7 +5,16 @@
 {% block content %}
     <div class="container account__container">
         <div class="account__content">
-            {%  if user_transactions %}
+                <form method="GET" class="form-filter">
+                    <label for="transaction_type">Тип транзакции:</label>
+                    <select id="transaction_type" name="transaction_type" class="trans-form__input-date">
+                        <option value="all">Все</option>
+                        <option value="income">Доходы</option>
+                        <option value="expense">Расходы</option>
+                    </select>
+                    <button type="submit" class="trans-form__btn">Применить</button>
+                </form>
+
                 <div class="transaction-filter">
                     <form method="GET" class="form-filter">
                         <label for="date_filter">Выберите день:</label>
@@ -25,6 +34,7 @@
                     <h1 class="account__rate-title"><b>История платежей</b></h1>
                 </div>
 
+
                 <table class="account__table">
                     <tr class="account__table-row">
                         <th class="account__table-column_header">'From' счет</th>
@@ -33,6 +43,7 @@
                         <th class="account__table-column_header">Дата</th>
                         <th class="account__table-column_header">Категория</th>
                     </tr>
+                {%  if user_transactions %}
                     {% for trans in user_transactions %}
                         <tr class="account__table-row">
                             <td class="account__table-column">{{ trans.from_account.account_name or '' }}</td>
@@ -43,8 +54,8 @@
                         </tr>
                     {% endfor %}
                 </table>
-            {% else %}
-                <p class="account__no-text">Ваша история транзакций пуста.</p>
+{#            {% else %}#}
+{#                <p class="account__no-text">Ваша история транзакций пуста.</p>#}
             {% endif %}
         </div>
     </div>

@@ -460,11 +460,14 @@ def transactions():
     period_end = request.args.get('period_end')
     period_end_date = datetime.strptime(period_end, '%Y-%m-%d') if period_end else None
 
+    transaction_type = request.args.get('transaction_type')
+
     user_transactions = get_user_transactions(
         current_user,
         date_filter=date_filter_date,
         period_start=period_start_date,
-        period_end=period_end_date
+        period_end=period_end_date,
+        transaction_type=transaction_type
     )
 
     return render_template('transactions.html', user_transactions=user_transactions)

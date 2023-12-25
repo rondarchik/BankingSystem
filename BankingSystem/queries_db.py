@@ -1,4 +1,6 @@
 from sqlalchemy import desc, func
+from sqlalchemy.orm import aliased
+
 from models import *
 
 
@@ -84,7 +86,7 @@ def get_user_deposits(user):
     return user_deposits
 
 
-def get_user_transactions(user, date_filter=None, period_start=None, period_end=None):
+def get_user_transactions(user, date_filter=None, period_start=None, period_end=None, transaction_type='all'):
     query = Transaction.query.join(BankAccount, (BankAccount.id == Transaction.from_account_id) | (
                 BankAccount.id == Transaction.to_account_id))
 
@@ -95,6 +97,17 @@ def get_user_transactions(user, date_filter=None, period_start=None, period_end=
 
     if period_start and period_end:
         query = query.filter(Transaction.transaction_date.between(period_start, period_end))
+
+    if transaction_type != 'all':
+        category_alias = aliased(Category)
+        category_type_alias = aliased(CategoryType)
+
+        query = (
+            query
+            .join(category_alias, category_alias.id == Transaction.category_id)
+            .join(category_type_alias, category_type_alias.id == category_alias.type_id)
+            .filter(category_type_alias.type_name == transaction_type)
+        )
 
     user_transactions = query.all()
 
