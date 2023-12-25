@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="static/css/index.css">
 </head>
 <body class="body__auth">
-    <div class="login__container">
+    <div class="register__container">
         <form method="POST" class="form-register">
             <div class="form__container">
                 <span class="from__title-register">
@@ -35,40 +35,83 @@
             <div class="form__group">
                 <div class="form__group-elem">
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="username" placeholder="{{ form.username.label.text + '*' }}">
+                        <input class="form__input" type="text" name="username"
+                               placeholder="{{ form.username.label.text + '*' }}"
+                               {% if form.username.data is not none %}value="{{ form.username.data }}{% endif %}">
+                        {% if form.username.errors %}
+                            <p class="form__error">{{ form.username.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="email" placeholder="{{ form.email.label.text + '*' }}">
+                        <input class="form__input" type="text" name="email"
+                               placeholder="{{ form.email.label.text + '*' }}"
+                               {% if form.email.data is not none %}value="{{ form.email.data }}{% endif %}">
+                        {% if form.email.errors %}
+                            <p class="form__error">{{ form.email.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="first_name" placeholder="{{ form.first_name.label.text }}">
+                        <input class="form__input" type="text" name="first_name"
+                               placeholder="{{ form.first_name.label.text }}"
+                               {% if form.first_name.data is not none %}value="{{ form.first_name.data }}{% endif %}">
+                        {% if form.first_name.errors %}
+                            <p class="form__error">{{ form.first_name.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="last_name" placeholder="{{ form.last_name.label.text }}">
+                        <input class="form__input" type="text" name="last_name"
+                               placeholder="{{ form.last_name.label.text }}"
+                               {% if form.last_name.data is not none %}value="{{ form.last_name.data }}{% endif %}">
+                        {% if form.last_name.errors %}
+                            <p class="form__error">{{ form.last_name.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="patronymic" placeholder="{{ form.patronymic.label.text }}">
+                        <input class="form__input" type="text" name="patronymic"
+                               placeholder="{{ form.patronymic.label.text }}"
+                               {% if form.patronymic.data is not none %}value="{{ form.patronymic.data }}{% endif %}">
+                        {% if form.patronymic.errors %}
+                            <p class="form__error">{{ form.patronymic.errors[0] }}</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="form__group-elem">
                     <div class="form__container form__input-container">
-                        <input class="form__input-date" type="date" name="birth_date" id="dateField" placeholder="{{ form.birth_date.label.text }}">
+                        <input class="form__input-date" type="date" name="birth_date" id="dateField"
+                               placeholder="{{ form.birth_date.label.text }}"
+                               {% if form.birth_date.data is not none %}value="{{ form.birth_date.data }}{% endif %}">
+                        {% if form.birth_date.errors %}
+                            <p class="form__error">{{ form.birth_date.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container">
-                        <input class="form__input" type="text" name="phone_number" placeholder="{{ form.phone_number.label.text }}">
+                        <input class="form__input" type="text" name="phone_number"
+                               placeholder="{{ form.phone_number.label.text }}"
+                               {% if form.phone_number.data is not none %}value="{{ form.phone_number.data }}{% endif %}">
+                        {% if form.phone_number.errors %}
+                            <p class="form__error">{{ form.phone_number.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container" >
-                        <input class="form__input" type="password" name="password" placeholder="{{ form.password.label.text + '*' }}">
+                        <input class="form__input" type="password" name="password"
+                               placeholder="{{ form.password.label.text + '*' }}">
+                        {% if form.password.errors %}
+                            <p class="form__error">{{ form.password.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container" >
-                        <input class="form__input" type="password" name="confirm_password" placeholder="{{ form.confirm_password.label.text + '*' }}">
+                        <input class="form__input" type="password" name="confirm_password"
+                               placeholder="{{ form.confirm_password.label.text + '*' }}">
+                        {% if form.confirm_password.errors %}
+                            <p class="form__error">{{ form.confirm_password.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__container form__input-container" id="department" style="display: none;">
@@ -77,6 +120,9 @@
                                 <option value="{{ dept[0] }}">{{ dept[1] }}</option>
                             {% endfor %}
                         </select>
+                        {% if form.department.errors %}
+                            <p class="form__error">{{ form.department.errors[0] }}</p>
+                        {% endif %}
                     </div>
 
                     <div class="form__text" id="client_field">

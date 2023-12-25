@@ -2,6 +2,22 @@
     display: block;
 }
 
+.register__container {
+    height: 600px;
+    width: 700px;
+    border-radius: 25px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form__error {
+    padding-left: 30px;
+    color: red;
+    font-size: 13px;
+}
+
 .from__title-register {
     color: #333333;
     font-size: 24px;

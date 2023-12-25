@@ -24,12 +24,25 @@
             </div>
             {{ form.hidden_tag() }}
 
+            {% for msg in get_flashed_messages() %}
+                <div class="flash_login">{{ msg }}</div>
+            {% endfor %}
+
             <div class="form__container form__input-email_container">
-                <input class="form__input" type="text" name="username" placeholder="{{ form.username.label.text }}">
+                <input class="form__input" type="text" name="username"
+                       placeholder="{{ form.username.label.text }}"
+                       {% if form.username.data is not none %}value="{{ form.username.data }}{% endif %}">
+                {% if form.username.errors %}
+                    <p class="form__error">{{ form.username.errors[0] }}</p>
+                {% endif %}
             </div>
 
             <div class="form__container form__input-password_container">
-                <input class="form__input" type="password" name="password" placeholder="{{ form.password.label.text }}">
+                <input class="form__input" type="password" name="password"
+                       placeholder="{{ form.password.label.text }}">
+                {% if form.password.errors %}
+                    <p class="form__error">{{ form.password.errors[0] }}</p>
+                {% endif %}
             </div>
 
             <div class="form__container form__btn-login_container">

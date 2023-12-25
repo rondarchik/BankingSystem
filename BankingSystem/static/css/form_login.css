@@ -10,6 +10,14 @@
 /*    display: flex;*/
 }
 
+.flash_login {
+    color: red;
+    text-align: center;
+    font-weight: 300;
+    font-size: 18px;
+    padding-bottom: 20px;
+}
+
 .from__title {
     color: #333333;
     font-size: 24px;

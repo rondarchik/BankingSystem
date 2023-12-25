@@ -1,19 +1,25 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, FloatField, BooleanField, PasswordField, SubmitField, DateField, RadioField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms.validators import DataRequired, Email, EqualTo, Regexp, Length
 
 
 class RegistrationForm(FlaskForm):
     role = RadioField('Выберете роль:', choices=[], validators=[DataRequired()])
     username = StringField('Имя пользователя', validators=[DataRequired()])
-    email = StringField('Электронная почта', validators=[DataRequired(), Email()])
+    email = StringField('Электронная почта', validators=[DataRequired(), Email(message='Invalid email format')])
     first_name = StringField('Имя', validators=[])
     last_name = StringField('Фамилия', validators=[])
     patronymic = StringField('Отчество', validators=[])
-    phone_number = StringField('Номер телефона', validators=[])
+    phone_number = StringField('Номер телефона',
+                               validators=[Regexp(r'^\+?\d{12}$', message='Invalid phone format')])
     birth_date = DateField('Дата рождения', format='%Y-%m-%d', validators=[])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    confirm_password = PasswordField('Повторите пароль', validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Пароль',
+                             validators=[DataRequired(),
+                                         Regexp(r'^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$', message='Invalid password'),
+                                         Length(min=8, message='Password must be at least 8 characters long')
+                                         ])
+    confirm_password = PasswordField('Повторите пароль',
+                                     validators=[DataRequired(), EqualTo('password', message='Passwords must match')])
     department = SelectField('Отдел', choices=[], validators=[DataRequired()])
 
     submit = SubmitField('Зарегистрироваться')
@@ -112,4 +118,3 @@ class DepositTransactionForm(FlaskForm):
     deposit = SelectField('Депозит пользователя', choices=[], validators=[DataRequired()])
 
     submit = SubmitField('Подтвердить')
-

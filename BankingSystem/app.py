@@ -22,7 +22,7 @@ with app.app_context():
 
 
 @login_manager.user_loader
-def load_user(user_id):  # ?????
+def load_user(user_id):
     return User.query.get(int(user_id))
 
 
@@ -34,6 +34,8 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             return redirect(url_for('home'))
+        else:
+            flash('Неверное имя пользователя или пароль!', 'error')
     else:
         print(form.errors)
     return render_template('login.html', form=form)
@@ -143,8 +145,8 @@ def profile():
 def home():
     currencies = Currency.query.filter(Currency.currency_name != 'BYN').all()
 
-    date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
-    date_str = date.strftime("%d.%m.%Y %H:%M")
+    rate_date = CurrencyRate.query.order_by(CurrencyRate.date.desc()).first().date
+    date_str = rate_date.strftime("%d.%m.%Y %H:%M")
 
     rates = []
     for currency in currencies:
@@ -629,15 +631,15 @@ def credit_transaction():
     accounts = get_user_byn_accounts(current_user)
     form.from_account.choices = [(account.id, account.account_name) for account in accounts]
 
-    credits = get_user_credits(current_user)
-    form.credit.choices = [(credit.id, credit.request.type.type_name) for credit in credits]
+    user_credits = get_user_credits(current_user)
+    form.credit.choices = [(_credit.id, _credit.request.type.type_name) for _credit in user_credits]
 
     if form.validate_on_submit():
         category_id = Category.query.filter_by(category_name='Оплата кредита').first().id
         from_account_id = int(request.form['from_account'])
         account = BankAccount.query.get(from_account_id)
         credit_id = int(request.form['credit'])
-        credit = Credit.query.get(credit_id)
+        user_credit = Credit.query.get(credit_id)
 
         if account and account.balance >= form.amount.data:
             new_transaction = Transaction(
@@ -649,7 +651,7 @@ def credit_transaction():
             )
 
             account.balance -= new_transaction.amount
-            credit.repaid_amount += new_transaction.amount
+            user_credit.repaid_amount += new_transaction.amount
 
             db.session.add(new_transaction)
             db.session.commit()
@@ -671,14 +673,14 @@ def deposit_transaction():
     form.from_account.choices = [(account.id, account.account_name) for account in accounts]
 
     deposits = get_user_deposits(current_user)
-    form.deposit.choices = [(deposit.id, deposit.type.type_name) for deposit in deposits]
+    form.deposit.choices = [(_deposit.id, _deposit.type.type_name) for _deposit in deposits]
 
     if form.validate_on_submit():
         category_id = Category.query.filter_by(category_name='Пополнение вклада').first().id
         from_account_id = int(request.form['from_account'])
         account = BankAccount.query.get(from_account_id)
         deposit_id = int(request.form['deposit'])
-        deposit = Deposit.query.get(deposit_id)
+        user_deposit = Deposit.query.get(deposit_id)
 
         if account and account.balance >= form.amount.data:
             new_transaction = Transaction(
@@ -690,7 +692,7 @@ def deposit_transaction():
             )
 
             account.balance -= new_transaction.amount
-            deposit.amount += new_transaction.amount
+            user_deposit.amount += new_transaction.amount
 
             db.session.add(new_transaction)
             db.session.commit()
