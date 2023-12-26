@@ -62,9 +62,9 @@ class BankAccountForm(FlaskForm):
 class CreditRequestForm(FlaskForm):
     amount = FloatField('Сумма', default=0.0, validators=[DataRequired()])
     credit_type = SelectField('Тип кредита', choices=[], validators=[DataRequired()])
-    interest_rate = FloatField('Процентная ставка', default=0.0, validators=[DataRequired()])
+    interest_rate = FloatField('Процентная ставка', default=0.0, validators=[])
     department = SelectField('Отделение', choices=[], validators=[DataRequired()])
-    term = IntegerField('Длительность', default=0, validators=[DataRequired()])
+    term = IntegerField('Длительность', default=0, validators=[])
 
     submit = SubmitField('Отправить')
 
@@ -72,8 +72,8 @@ class CreditRequestForm(FlaskForm):
 class DepositRequestForm(FlaskForm):
     amount = FloatField('Сумма', default=0.0, validators=[DataRequired()])
     deposit_type = SelectField('Тип кредита', choices=[], validators=[DataRequired()])
-    interest_rate = FloatField('Процентная ставка', default=0.0, validators=[DataRequired()])
-    term = IntegerField('Длительность', default=0, validators=[DataRequired()])
+    interest_rate = FloatField('Процентная ставка', default=0.0, validators=[])
+    term = IntegerField('Длительность', default=0, validators=[])
 
     submit = SubmitField('Отправить')
 
