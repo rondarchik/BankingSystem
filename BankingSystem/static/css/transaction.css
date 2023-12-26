@@ -110,3 +110,18 @@
     color: #FFFFFF;
     font-size: 17px;
 }
+
+.transaction-filter {
+    /*margin-left: 150px;*/
+    /*margin-bottom: 20px;*/
+    /*font-size: 17px;*/
+}
+
+.pb-trans {
+    padding-bottom: 20px;
+}
+
+.trans-center {
+    justify-content: center;
+    display: flex;
+}

@@ -1,8 +1,17 @@
+from googletrans import Translator
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 from dateutil.relativedelta import relativedelta
 from datetime import date, timedelta
-from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
+from flask import Flask, render_template, redirect, url_for, request, jsonify, flash, send_file
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 from config import Config
 from forms import *
 from queries_db import *
@@ -446,6 +455,71 @@ def create_deposit():
         print(form.errors)
 
     return render_template('new_deposit.html', form=form)
+
+
+def translate_to_english(word):
+    translator = Translator()
+    translation = translator.translate(word, src='ru', dest='en')
+    return translation.text
+
+@app.route('/transactions/pdf', methods=['GET'])
+@login_required
+def transactions_pdf():
+    date_filter = request.args.get('date_filter', default=None)
+    period_start = request.args.get('period_start', default=None)
+    period_end = request.args.get('period_end', default=None)
+    transaction_type = request.args.get('transaction_type', default='all')
+
+    user_transactions = get_user_transactions(
+        current_user,
+        date_filter=date_filter,
+        period_start=period_start,
+        period_end=period_end,
+        transaction_type=transaction_type
+    )
+
+    # Генерация PDF
+    pdf_buffer = BytesIO()
+    pdf_doc = SimpleDocTemplate(pdf_buffer, pagesize=letter)
+    pdf_content = []
+
+    # Добавление таблицы в документ
+    table_data = [
+        ['From счет', 'To счет', 'Сумма', 'Дата', 'Категория'],
+    ]
+
+    for trans in user_transactions:
+        table_data.append([
+            translate_to_english(trans.from_account.account_name) if trans.from_account else '',
+            translate_to_english(trans.to_account.account_name) if trans.to_account else '',
+            f'{trans.amount:.2f}',
+            trans.transaction_date.strftime('%Y-%m-%d'),
+            translate_to_english(trans.category.category_name),
+        ])
+
+    pdf_table = Table(table_data)
+
+    pdfmetrics.registerFont(TTFont('ArialUnicode', 'arial.ttf'))
+
+    pdf_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), '#ffffff'),
+        ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'ArialUnicode'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), '#ffffff'),
+        ('GRID', (0, 0), (-1, -1), 1, '#000000'),
+        ('FONTNAME', (0, 0), (-1, 0), 'ArialUnicode'),
+    ]))
+
+    pdf_content.append(pdf_table)
+
+    # Сохранение PDF в файл
+    pdf_doc.build(pdf_content)
+    pdf_buffer.seek(0)
+
+    # Отправка файла пользователю
+    return send_file(pdf_buffer, download_name='transactions.pdf', as_attachment=True)
 
 
 @app.route('/transactions', methods=['POST', 'GET'])
